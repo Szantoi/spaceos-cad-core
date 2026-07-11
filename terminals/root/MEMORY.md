@@ -529,7 +529,7 @@ Gábor kérésére a 3 lokál mappa (Cabinet_bilder_scripts → **spaceos-cad-co
 **Azonnali intézkedés:** mindhárom repó privátra zárva a felfedezés pillanatában.
 
 **Teljes helyreállítás (ugyanaznap):**
-1. VPS értesítve (MSG-SPACEOS-001, kritikus prioritás) a cabinet-bridge token kompromittálódásáról, kérve az ő oldali rotációjukat — VÁLASZRA VÁR.
+1. VPS értesítve (MSG-SPACEOS-001, kritikus prioritás) a cabinet-bridge token kompromittálódásáról, kérve az ő oldali rotációjukat — **✅ MEGTÖRTÉNT**: a VPS rotálta, az új tokent Gábor relézte, `.mcp.json` (root + gyökér) frissítve, `poll-federation-inbox.ps1` hibamentesen fut vele.
 2. `vps-bridge` token (ezt MI validáljuk) azonnal rotálva lokálban, az új érték elküldve a VPS-nek (MSG-SPACEOS-002).
 3. `claude-main` és `conductor` tokenek rotálva (elővigyázatosságból, bár a git historyban talált értékek már eleve nem voltak élők) — `agents.yaml` (mindkét knowledge-service példány), `.mcp.json` (root + gyökér), `terminals/conductor/.agents/mcp_config.json` frissítve, hot-reload-dal ellenőrizve (régi token elutasítva, új elfogadva).
 4. A leaked tartalom redaktálva minden trackelt fájlból (MEMORY.md, outbox, federacio_atadas_vps_root.md).

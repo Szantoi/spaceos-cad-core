@@ -722,3 +722,16 @@ ssh spaceos-gabor
 - [ ] Titkok kivezetése a configokból env-be (MCP_AUTH_TOKEN, MCP_TOKEN_<NAME> már támogatott)
 
 **Kapcsolódó tudásdokumentum:** `docs/knowledge/multi_agent_mcp_integracio_rag.md`
+
+### 2026-07-11 (késő este) — ÚJ, MÁSODIK federációs csatorna: PostgreSQL Messaging REST API
+
+A VPS a `federation.messages` központi PostgreSQL táblára (l. [[vps-szeparalt-kozpontositas-nexus]] személyes memória) épített egy sima REST endpointot, ami **kiváltja/kiegészíti** az eddigi MCP `send_message`/`list_inbox` hívásokat:
+
+- **Endpoint**: `POST https://datahaven.joinerytech.hu/api/messages/send`
+- **Auth**: ugyanaz a `cabinet-bridge` bearer token, mint az MCP-nél (`terminals/root/.mcp.json` → `spaceos-knowledge-vps` → `Authorization`).
+- **Body**: `{from_island, from_terminal, to_island, to_terminal, msg_type, priority, subject, body}` — itt `from_island: "cabinet"`, `to_island: "nexus"` (nem "spaceos"/"cabinet-bridge" mint az MCP-nél — MÁS címzési séma!).
+- **Élesben tesztelve** (2026-07-11 21:42): `HTTP 201`, valós UUID-vel visszaigazolva.
+
+**Előny a jelenlegi Claude Code session MCP-kapcsolatához képest**: ez egy sima `curl`/`Invoke-RestMethod` hívás, NEM szenved a "session-szintű MCP-kapcsolat a régi, gyorsítótárazott tokent használja" problémától (l. a cabinet-bridge token-csere incidens tanulsága fentebb) — minden hívás friss processz, friss `.mcp.json`-beli tokent olvas.
+
+**Nyitott**: nincs még bejövő (VPS→Cabinet) megfelelője letesztelve ezen az API-n (a `poll-federation-inbox.ps1` továbbra is a régi MCP `list_inbox`-ot használja) — érdemes lenne rákérdezni, van-e `GET /api/messages/inbox`-szerű végpont is, hogy a pollert is erre lehessen átállítani.

@@ -1,0 +1,174 @@
+﻿<Window x:Class="CabinetBilder.Adapter.AutoCAD.UI.CatalogManagement.CatalogManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="AnyagkatalĂłgus kezelĂ©se" Height="600" Width="900"
+        Background="#1E1E1E" Foreground="#E0E0E0"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        
+        <Style x:Key="StringToVis" TargetType="FrameworkElement">
+            <Setter Property="Visibility" Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding StatusMessage}" Value="">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding StatusMessage}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#454545"/>
+                    <Setter Property="BorderBrush" Value="#007ACC"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Toolbar -->
+            <RowDefinition Height="*"/>    <!-- DataGrid -->
+            <RowDefinition Height="Auto"/> <!-- Status Bar -->
+        </Grid.RowDefinitions>
+
+        <!-- Header / Toolbar -->
+        <Border Grid.Row="0" Background="#2D2D30" Padding="8" BorderBrush="#3F3F46" BorderThickness="0,0,0,1">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding AddCommand}" Content="ďĽ‹ Ăšj anyag" Margin="0,0,8,0"/>
+                    <Button Command="{Binding DeleteCommand}" Content="đź—‘ TĂ¶rlĂ©s" Margin="0,0,8,0"/>
+                    <Button Command="{Binding RefreshCommand}" Content="â†» FrissĂ­tĂ©s" Margin="0,0,8,0"/>
+                    
+                    <Rectangle Width="1" Fill="#3F3F46" Margin="8,4" VerticalAlignment="Stretch"/>
+                    
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0">
+                        <TextBlock Text="đź”Ť KeresĂ©s:" Foreground="#999999" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Width="200" Padding="6,4" Background="#252526" Foreground="White" BorderBrush="#3F3F46" 
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button HorizontalAlignment="Right" Command="{Binding SaveCommand}" Content="đź’ľ MĂłdosĂ­tĂˇsok mentĂ©se" 
+                        Padding="16,6" Background="#007ACC" Foreground="White" BorderThickness="0" FontWeight="SemiBold"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <DataGrid x:Name="MaterialsGrid"
+                      ItemsSource="{Binding FilteredMaterials}"
+                      SelectedItem="{Binding SelectedMaterial}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      Background="#1E1E1E"
+                      RowBackground="#1E1E1E"
+                      Foreground="White"
+                      BorderThickness="0"
+                      GridLinesVisibility="Horizontal"
+                      HorizontalGridLinesBrush="#333333"
+                      SelectionMode="Single"
+                      HeadersVisibility="Column"
+                      RowHeaderWidth="0">
+                
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#252526"/>
+                        <Setter Property="Foreground" Value="#CCCCCC"/>
+                        <Setter Property="Padding" Value="8,10"/>
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                        <Setter Property="BorderBrush" Value="#3F3F46"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                    </Style>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#094771"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Padding" Value="8,4"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                    <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                        <ContentPresenter VerticalAlignment="Center" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.Columns>
+                    <!-- Status indicator -->
+                    <DataGridTemplateColumn Width="40" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Ellipse Width="10" Height="10" Margin="4">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Fill" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsNew}" Value="True">
+                                                    <Setter Property="Fill" Value="#4CAF50"/>
+                                                    <Setter Property="ToolTip" Value="Ăšj tĂ©tel"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsModified}" Value="True">
+                                                    <Setter Property="Fill" Value="#FF9800"/>
+                                                    <Setter Property="ToolTip" Value="MĂłdosĂ­tva"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="KĂłd" Binding="{Binding Code, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                    <DataGridTextColumn Header="MegnevezĂ©s" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                    <DataGridTextColumn Header="VastagsĂˇg (mm)" Binding="{Binding Thickness, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                    <DataGridTextColumn Header="SĹ±rĹ±sĂ©g (kg/m3)" Binding="{Binding Density, UpdateSourceTrigger=PropertyChanged}" Width="130"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Busy Indicator Overlay -->
+            <Grid Background="#B0000000" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
+                <StackPanel VerticalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Width="250" Height="4" Foreground="#007ACC" Background="#333333" BorderThickness="0"/>
+                    <TextBlock Text="{Binding StatusMessage}" HorizontalAlignment="Center" Margin="0,15,0,0" Foreground="White" FontSize="14"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Background="#007ACC" Padding="12,6" Style="{StaticResource StringToVis}">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="White" FontWeight="Medium"/>
+        </Border>
+    </Grid>
+</Window>
+

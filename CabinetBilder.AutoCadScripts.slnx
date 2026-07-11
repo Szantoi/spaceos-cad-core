@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="CabinetBilder.Core/CabinetBilder.Core.csproj" />
+  <Project Path="CabinetBilder.SpaceOsBridge/CabinetBilder.SpaceOsBridge.csproj" />
+  <Project Path="CabinetBilder.Adapter.AutoCAD/CabinetBilder.Adapter.AutoCAD.csproj" />
+  <Project Path="CabinetBilder.McpHost/CabinetBilder.McpHost.csproj" />
+  <Project Path="CabinetBilder.McpHost.Tests/CabinetBilder.McpHost.Tests.csproj" />
+  <Project Path="CabinetBilder.Tests/CabinetBilder.Tests.csproj" />
+</Solution>

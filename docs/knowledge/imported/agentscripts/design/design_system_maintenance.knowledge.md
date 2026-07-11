@@ -1,0 +1,480 @@
+---
+name: design-system-maintenance
+description: 'Reusable design component and design token maintenance protocols. Use when managing component libraries, design tokens, or ensuring design consistency across the project.'
+domain: design
+last_updated: 2026-02-24
+---
+
+# Skill: Design System Maintenance
+
+## ?? Purpose
+
+Konzisztens, újrafelhasználható design komponensek és design tokenek karbantartása. Biztosítja a design consistency-t a projekt egészében.
+
+---
+
+## ?? Teoretikus Háttér
+
+**Design System:**
+> Gyûjtemény újrafelhasználható komponensekbõl, design tokenekbõl és usage guidelines-okból.
+
+**Miért fontos?**
+
+- **Konzisztencia**: Minden komponens ugyanúgy néz ki és viselkedik
+- **Hatékonyság**: Ne találjuk fel újra a kereket minden feature-höz
+- **Skálázhatóság**: Változtatás egy helyen › frissül mindenhol
+- **Kommunikáció**: Közös nyelv designer és developer között
+
+**Design System komponensei:**
+
+1. **Design Tokens** - Színek, typography, spacing, shadows
+2. **Components** - Button, input, card, modal, nav
+3. **Patterns** - Gyakori UI patterns (form layout, card grid)
+4. **Guidelines** - Mikor használd, mikor ne
+
+---
+
+## ?? Design Tokens
+
+**Design Tokens = Design döntések kódolva**
+
+### 1. Colors
+
+**Semantic colors (ne csak HEX értékek):**
+
+```markdown
+## Color Tokens
+
+### Primary Colors
+- `--color-primary`: #007bff (Brand blue)
+- `--color-primary-hover`: #0056b3 (Darker on hover)
+- `--color-primary-light`: #cce5ff (Light backgrounds)
+
+### Secondary Colors
+- `--color-secondary`: #6c757d (Neutral gray)
+- `--color-secondary-hover`: #545b62
+- `--color-secondary-light`: #e9ecef
+
+### Accent Colors
+- `--color-accent`: #FFC107 (Warning/attention - hot color)
+- `--color-accent-hover`: #e0a800
+
+### Semantic Colors
+- `--color-success`: #28a745 (Green - success states)
+- `--color-error`: #dc3545 (Red - error states)
+- `--color-warning`: #ffc107 (Yellow - warning states)
+- `--color-info`: #17a2b8 (Cyan - info states)
+
+### Neutral Colors
+- `--color-background`: #ffffff (Main background)
+- `--color-surface`: #f8f9fa (Cards, panels)
+- `--color-border`: #dee2e6 (Borders, dividers)
+- `--color-text-primary`: #1f2328 (Main text)
+- `--color-text-secondary`: #6c757d (Secondary text)
+- `--color-text-disabled`: #adb5bd (Disabled text)
+
+### Accessibility
+- All text colors pass WCAG AA (4.5:1 contrast on backgrounds)
+- Primary on white: 4.54:1 ?
+- Text primary on white: 15.48:1 ?
+- Text secondary on white: 4.68:1 ?
+```
+
+---
+
+### 2. Typography
+
+```markdown
+## Typography Tokens
+
+### Font Families
+- `--font-sans`: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif
+- `--font-mono`: 'Fira Code', 'Courier New', monospace
+
+### Font Sizes (rem-based for scalability)
+- `--font-size-xs`: 0.75rem (12px)
+- `--font-size-sm`: 0.875rem (14px)
+- `--font-size-base`: 1rem (16px) ‹ body text default
+- `--font-size-lg`: 1.125rem (18px)
+- `--font-size-xl`: 1.25rem (20px)
+- `--font-size-2xl`: 1.5rem (24px)
+- `--font-size-3xl`: 2rem (32px)
+- `--font-size-4xl`: 2.5rem (40px)
+
+### Font Weights
+- `--font-weight-normal`: 400
+- `--font-weight-medium`: 500
+- `--font-weight-semibold`: 600
+- `--font-weight-bold`: 700
+
+### Line Heights
+- `--line-height-tight`: 1.25
+- `--line-height-normal`: 1.5 ‹ body text default
+- `--line-height-relaxed`: 1.75
+
+### Letter Spacing
+- `--letter-spacing-tight`: -0.025em
+- `--letter-spacing-normal`: 0
+- `--letter-spacing-wide`: 0.025em
+```
+
+---
+
+### 3. Spacing (4px Grid System)
+
+```markdown
+## Spacing Tokens (4px grid)
+
+- `--space-0`: 0
+- `--space-1`: 0.25rem (4px)
+- `--space-2`: 0.5rem (8px)
+- `--space-3`: 0.75rem (12px)
+- `--space-4`: 1rem (16px) ‹ most common
+- `--space-5`: 1.25rem (20px)
+- `--space-6`: 1.5rem (24px)
+- `--space-8`: 2rem (32px)
+- `--space-10`: 2.5rem (40px)
+- `--space-12`: 3rem (48px)
+- `--space-16`: 4rem (64px)
+
+**Usage:**
+- Padding inside components: space-4 (16px)
+- Margin between components: space-6 (24px)
+- Section spacing: space-12 (48px)
+```
+
+---
+
+### 4. Border Radius & Shadows
+
+```markdown
+## Border Radius Tokens
+
+- `--radius-none`: 0
+- `--radius-sm`: 0.125rem (2px)
+- `--radius-base`: 0.25rem (4px)
+- `--radius-md`: 0.375rem (6px)
+- `--radius-lg`: 0.5rem (8px)
+- `--radius-xl`: 0.75rem (12px)
+- `--radius-full`: 9999px (pill-shaped)
+
+## Shadow Tokens
+
+- `--shadow-sm`: 0 1px 2px rgba(0, 0, 0, 0.05)
+- `--shadow-base`: 0 1px 3px rgba(0, 0, 0, 0.1)
+- `--shadow-md`: 0 4px 6px rgba(0, 0, 0, 0.1)
+- `--shadow-lg`: 0 10px 15px rgba(0, 0, 0, 0.1)
+- `--shadow-xl`: 0 20px 25px rgba(0, 0, 0, 0.15)
+```
+
+---
+
+## ?? Components
+
+### Component Documentation Template
+
+```markdown
+# Component: [Komponens Név]
+
+**Category**: [Form / Navigation / Feedback / Layout]
+**Last Updated**: [dátum]
+
+---
+
+## Purpose
+
+[1-2 mondatban: Mire való ez a komponens?]
+
+**Example:** Button komponens interaktív akciók triggerelésére (submit, cancel, primary action).
+
+---
+
+## Variants
+
+### 1. Primary Button
+- **Usage**: Main call-to-action (CTA)
+- **Visual**: `background: var(--color-primary)`, `color: white`
+- **States**: default, hover, active, disabled, focus
+
+### 2. Secondary Button
+- **Usage**: Less prominent actions
+- **Visual**: `border: 1px solid var(--color-border)`, `background: transparent`
+- **States**: default, hover, active, disabled, focus
+
+### 3. Danger Button
+- **Usage**: Destructive actions (delete, remove)
+- **Visual**: `background: var(--color-error)`, `color: white`
+- **States**: default, hover, active, disabled, focus
+
+---
+
+## States
+
+| State | Visual Change | Interaction |
+| ----- | ------------- | ----------- |
+| Default | Standard colors | Resting state |
+| Hover | Background darken 10% | Mouse over |
+| Active | Background darken 20% | Click/press |
+| Disabled | Opacity 0.5, cursor not-allowed | No interaction |
+| Focus | 2px outline `var(--color-primary)` | Keyboard focus |
+| Loading | Spinner icon, disabled | Async action |
+
+---
+
+## Accessibility
+
+- [ ] Keyboard accessible (Enter/Space activates)
+- [ ] Focus indicator visible (2px outline, 3:1 contrast)
+- [ ] Touch target min 44x44px (mobile)
+- [ ] Screen reader announces button text
+- [ ] Disabled state `aria-disabled="true"`
+- [ ] Loading state `aria-busy="true"` + screen reader announcement
+
+---
+
+## Spacing & Sizing
+
+**Sizes:**
+- Small: `height: 32px`, `padding: 0 12px`, `font-size: 14px`
+- Medium: `height: 40px`, `padding: 0 16px`, `font-size: 16px` ‹ default
+- Large: `height: 48px`, `padding: 0 24px`, `font-size: 18px`
+
+**Icon Spacing:**
+- Icon + text: `gap: 8px` (space-2)
+- Icon-only: `padding: equal (square)`
+
+---
+
+## Usage Guidelines
+
+**When to use:**
+- ? Primary action on a page (e.g., "Save", "Submit")
+- ? Form submissions
+- ? Triggering actions (e.g., "Add Item", "Export")
+
+**When NOT to use:**
+- ? Navigation ??? pages › Use Link instead
+- ? Non-interactive elements › Use div/span
+- ? Toggle states › Use Toggle/Switch component
+
+---
+
+## Code Example (React)
+
+\`\`\`tsx
+interface ButtonProps {
+  variant?: 'primary' | 'secondary' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  loading?: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+export function Button({
+  variant = 'primary',
+  size = 'md',
+  disabled = false,
+  loading = false,
+  children,
+  onClick
+}: ButtonProps) {
+  return (
+    <button
+      className={\`btn btn-\${variant} btn-\${size}\`}
+      disabled={disabled || loading}
+      onClick={onClick}
+      aria-disabled={disabled || loading}
+      aria-busy={loading}
+    >
+      {loading && <Spinner />}
+      {children}
+    </button>
+  );
+}
+\`\`\`
+
+---
+
+## Visual Examples
+
+[Include screenshots or Figma links]
+
+- Default state
+- Hover state
+- Focus state
+- Disabled state
+- Loading state
+
+---
+
+## Related Components
+
+- **Link**: For navigation between pages
+- **IconButton**: Button with only icon (no text)
+- **ButtonGroup**: Multiple buttons grouped together
+
+```
+
+---
+
+## ?? Execution Steps
+
+### Step 1: Identify Component Need
+
+**Trigger:**
+
+- New feature needs komponens (pl. Card)
+- Meglévõ komponens inconsistency (pl. 3 féle button style)
+- A11y issue pattern (pl. minden modal hiányzik focus trap)
+
+### Step 2: Check if Component Exists
+
+**Keress a design system-ben:**
+
+- `docs/design-system/components/` mappa
+- Figma design library
+- Frontend component library (src/components/)
+
+**Döntés:**
+
+- ? **Létezik** › Update meglévõ komponenst
+- ? **Nem létezik** › Create új komponenst
+
+### Step 3: Document Component
+
+**Használd a fenti component template-et:**
+
+1. Purpose (mire való)
+2. Variants (típusok: primary, secondary, danger)
+3. States (default, hover, active, disabled, focus, loading)
+4. Accessibility checklist
+5. Spacing & sizing
+6. Usage guidelines (when to use, when NOT to use)
+7. Code example (React component interface)
+
+### Step 4: Define Design Tokens
+
+**Ha új color/typography/spacing szükséges:**
+
+1. Ne hard-code HEX values › Design token
+2. Semantic naming (`--color-primary`, nem `--color-blue`)
+3. Accessibility check (contrast ratio)
+4. Document in `docs/design-system/tokens.md`
+
+### Step 5: Create Usage Guidelines
+
+**Kritikus szekció:**
+
+- **When to use** - Példák positive use cases
+- **When NOT to use** - Anti-patterns
+- **Related components** - Alternatívák
+
+**Példa (Button):**
+
+- ? Use: Form submit, CTA
+- ? Don't use: Navigation › Use Link
+- Related: Link, IconButton
+
+### Step 6: Save Documentation
+
+**Fájl neve:**
+
+- `docs/design-system/components/{component-name}.md`
+- `docs/design-system/tokens.md` (design tokens)
+- `docs/design-system/patterns/{pattern-name}.md` (patterns)
+
+### Step 7: Handoff to Frontend Developer
+
+**Mit adj át:**
+
+- Component documentation
+- Design tokens használata
+- Accessibility requirements
+- Code example (interface)
+
+---
+
+## ?? Design System Structure
+
+```
+docs/design-system/
++¦¦ README.md (Overview, philosophy, how to use)
++¦¦ tokens.md (Colors, typography, spacing, shadows)
++¦¦ components/
+-   +¦¦ button.md
+-   +¦¦ input.md
+-   +¦¦ card.md
+-   +¦¦ modal.md
+-   L¦¦ ...
++¦¦ patterns/
+-   +¦¦ form-layout.md
+-   +¦¦ card-grid.md
+-   +¦¦ navigation.md
+-   L¦¦ ...
+L¦¦ guidelines/
+    +¦¦ color-usage.md
+    +¦¦ typography-scales.md
+    +¦¦ spacing-system.md
+    L¦¦ accessibility.md
+```
+
+---
+
+## ?? Common Mistakes
+
+1. ? **Hard-coded values:**
+   - Rossz: `color: #007bff`
+   - Jó: `color: var(--color-primary)`
+
+2. ? **Minden komponens egyedi:**
+   - Rossz: 5 különbözõ button style
+   - Jó: 1 komponens 5 varianttal
+
+3. ? **Nincs usage guideline:**
+   - Rossz: "Itt a Button komponens" (mikor használjam?)
+   - Jó: "Use Button for actions, Link for navigation"
+
+4. ? **Accessibility utólag:**
+   - Rossz: "Majd késõbb csinálunk a11y-t"
+   - Jó: A11y checklist minden komponens doc-ban
+
+5. ? **Design-developer disconnect:**
+   - Rossz: Designer Figma-ban design-ol, developer nem tudja
+   - Jó: Design system dokumentáció közös referencia
+
+---
+
+## ?? Related Skills
+
+- **Input from**: `jtbd_analysis.knowledge.md`, `accessibility_audit.knowledge.md`
+- **Output to**: Frontend Developer (component implementation)
+- **Complementary**: `color_theory.knowledge.md` (color tokens használata)
+
+---
+
+## ?? Resources
+
+**Awesome-copilot source:**
+
+## ?? Resources
+
+**Source:**
+
+- Design tokens patterns from awesome-copilot templates
+- Component documentation patterns from [`reactjs.instructions.md`](../instructions/reactjs.instructions.md) and [`nextjs-tailwind.instructions.md`](../instructions/nextjs-tailwind.instructions.md)
+
+**Further Reading:**
+
+- [Design Systems Handbook](https://www.designbetter.co/design-systems-handbook)
+- [Atomic Design](https://atomicdesign.bradfrost.com/)
+- [Material Design System](https://material.io/design)
+- [Tailwind Design Tokens](https://tailwindcss.com/docs/customizing-colors)
+
+---
+
+**Output Example Paths:**
+
+- `docs/design-system/components/button.md`
+- `docs/design-system/tokens.md`
+- `docs/design-system/patterns/form-layout.md`

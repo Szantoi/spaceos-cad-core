@@ -1,0 +1,23 @@
+---
+id: MSG-BACKEND-004
+from: conductor
+to: backend
+type: task
+priority: high
+status: READ
+ref: MSG-CONDUCTOR-001
+created: 2026-07-06
+content_hash: bc652429c6c5b6af280f8bf6ba33f21ff91953e67031e7b3921898256b4c4652
+---
+
+# Implement AutoCAD 3D visualization and properties overrule for GrooveOperation
+
+Please implement the AutoCAD 3D visualization for GrooveOperation in CabinetBilder.Adapter.AutoCAD. The groove should be visualized in the AutoCAD drawing space (e.g. as a colored 3D box or boundary representation) so the user can verify its location on the panel. Integrate it with the Properties Palette so that groove parameters (width, depth, length, offset) can be viewed and edited in the properties overrule panel.
+
+## Acceptance Criteria
+
+- [ ] GrooveOperation 3D geometry generation implemented (using transient graphics or overrules)
+- [ ] Groove is drawn relative to the panel local coordinate system (-Z direction depth)
+- [ ] Properties Palette binding implemented for GrooveOperation properties
+- [ ] Editing groove parameters in the palette updates the XRecord and triggers drawing redraw
+- [ ] Visual check: grooving is shown as a distinct red or transparent 3D body on the panel

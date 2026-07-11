@@ -1,0 +1,19 @@
+{
+  "PluginVersion": "1.0.0.0",
+  "Runtime": ".NET 10.0.2",
+  "ConnectionState": "Unauthenticated",
+  "ActiveTenant": null,
+  "LocalStore": {
+    "SchemaVersion": 1,
+    "IntegrityCheck": "ok",
+    "TemplateCacheCount": 0,
+    "MaterialCacheCount": 0,
+    "SeenGuidsCount": 0,
+    "OutboxPending": 0,
+    "OutboxSucceededLast30d": 0,
+    "OutboxFailed": 0
+  },
+  "LastSyncAt": null,
+  "TenantsConfigured": 0,
+  "OutboxEntries": []
+}

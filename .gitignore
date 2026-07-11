@@ -1,0 +1,97 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# IDE settings
+.vscode/
+.vs/
+*.sln.iml
+
+# Visual Studio Code
+.editorconfig
+
+# Rider (JetBrains IDE)
+.idea/
+*.sln.iml
+
+# NuGet
+.nuget/
+*.nupkg
+*.snupkg
+NuGet.Config
+packages/
+
+# Local environment and packages
+.env
+.env.local
+node_modules/
+
+# Secrets / bearer tokens (MCP configs carry per-terminal tokens)
+.mcp.json
+**/.mcp.json
+**/.agents/mcp_config.json
+
+# Claude Code local settings (permission-approval history can embed literal
+# command strings, which may contain tokens/secrets typed during a session)
+.claude/settings.local.json
+
+# One-off manual backups (git history is now the real safety net — a manual
+# backup folder is redundant and risks re-committing stale secrets)
+docs/knowledge.pre-split-backup-*/
+
+# Scratch/debug dumps — raw federation message dumps and ad-hoc test scripts,
+# have contained live tokens before; never meant to be committed
+/scratch/
+
+# AutoCAD related
+*.dwg
+*.bak
+*.isav
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Test Results
+[Tt]estResults/
+*.trx
+*.coverage
+
+# Crash dumps
+*.stackdump
+
+# Miscellaneous
+*.log
+~$*.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Documentation build
+docs/_build/
+
+# Coverage reports
+.coverage
+htmlcov/

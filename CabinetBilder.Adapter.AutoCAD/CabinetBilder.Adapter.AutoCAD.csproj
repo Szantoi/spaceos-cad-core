@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
+    <AutoCADManagedDllPath Condition="'$(AutoCADManagedDllPath)' == ''">C:\Program Files\Autodesk\AutoCAD 2027</AutoCADManagedDllPath>
+    <!-- WPF UserControl az AutoCAD PaletteSet-ben; WindowsForms az ElementHost bridge-hez -->
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Allow test project to access internal types (ViewModel, etc.) -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>CabinetBilder.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="8.0.0" />
+    
+    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+    <PackageReference Include="Ardalis.Result.FluentValidation" Version="10.1.0" />
+    
+    <PackageReference Include="Minio" Version="6.0.4" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.24" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.0" />
+    
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
+    
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.4" />
+
+    <ProjectReference Include="..\CabinetBilder.Core\CabinetBilder.Core.csproj" />
+    <ProjectReference Include="..\CabinetBilder.SpaceOsBridge\CabinetBilder.SpaceOsBridge.csproj" />
+
+    <Reference Include="acdbmgd">
+      <HintPath>$(AutoCADManagedDllPath)\acdbmgd.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="accoremgd">
+      <HintPath>$(AutoCADManagedDllPath)\accoremgd.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="acmgd">
+      <HintPath>$(AutoCADManagedDllPath)\acmgd.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="AcPropServices">
+      <HintPath>$(AutoCADManagedDllPath)\AcPropServices.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="ValidateAutoCadPath" BeforeTargets="BeforeBuild">
+    <Error Condition="!Exists('$(AutoCADManagedDllPath)\\acdbmgd.dll')" Text="AutoCAD managed assemblies not found. Set AutoCADManagedDllPath to your AutoCAD installation folder (for example: C:\Program Files\Autodesk\AutoCAD 2027)." />
+  </Target>
+
+</Project>
+

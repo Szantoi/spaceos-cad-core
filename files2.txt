@@ -1,0 +1,11 @@
+﻿C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\Application\UseCases\CreateFrontMatterFromBlockUseCase.cs
+C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\Commands\DimensionCommands.cs
+C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\Infrastructure\ObjectMetadata\DrawingObjectMetadataStore.cs
+C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\Infrastructure\TypeStore\DrawingTypeStore.cs
+C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\obj\Debug\net10.0\.NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\obj\Debug\net10.0\App.AutoCadScripts.AssemblyInfo.cs
+C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\obj\Debug\net10.0\App.AutoCadScripts.GlobalUsings.g.cs
+C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\obj\Release\net10.0\.NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\obj\Release\net10.0\App.AutoCadScripts.AssemblyInfo.cs
+C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\obj\Release\net10.0\App.AutoCadScripts.GlobalUsings.g.cs
+C:\Users\szant\Documents\Development\Cabinet_bilder_scripts\App.AutoCadScripts\Properties\AssemblyInfo.cs

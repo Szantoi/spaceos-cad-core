@@ -520,6 +520,26 @@ Gábor döntése alapján (l. [[vps-4-sziget-atszervezes-oka]] személyes memór
 
 **Nyitott**: a 8 nem-root terminál egyike sem kapott Doorstar-hozzáférést — ha valamelyiknek Doorstar-specifikus munkája lesz, egy második MCP-bejegyzést kell kapnia (kis, célzott follow-up).
 
+### ⚠️ 2026-07-11 — BIZTONSÁGI INCIDENS + HELYREÁLLÍTÁS: GitHub repók + token-szivárgás
+
+Gábor kérésére a 3 lokál mappa (Cabinet_bilder_scripts → **spaceos-cad-core**, knowledge-service-0.0.01 → **spaceos-cad-nexus**, knowledge-service-doorstar → **spaceos-cad-doorstar**) publikus GitHub repót kapott a Szantoi fiók alatt, a VPS 4-repós mintáját követve (l. [[vps-github-repok]] személyes memória). A "helyi fejlesztés a VPS-fejlesztés hardver-kötött része" elv alapján (l. [[lokal-fejlesztes-hardver-kotott-resze]]).
+
+**Incidens:** az első push után kiderült, hogy a `spaceos-cad-core` publikus commit-jaiban **valódi, élő bearer tokenek** voltak (`docs/knowledge/federacio_atadas_vps_root.md`-ben és a backup-másolatában: a **cabinet-bridge** és **vps-bridge** federációs tokenek; `.claude/settings.local.json`-ban és `scratch/`-ban régebbi, már nem élő claude-main/conductor tokenek). A `spaceos-cad-nexus`/`spaceos-cad-doorstar` repókban egy előre létező, hardcode-olt fallback token is volt a `bin/stdio-bridge.js`-ben (nem élő, de rossz gyakorlat).
+
+**Azonnali intézkedés:** mindhárom repó privátra zárva a felfedezés pillanatában.
+
+**Teljes helyreállítás (ugyanaznap):**
+1. VPS értesítve (MSG-SPACEOS-001, kritikus prioritás) a cabinet-bridge token kompromittálódásáról, kérve az ő oldali rotációjukat — VÁLASZRA VÁR.
+2. `vps-bridge` token (ezt MI validáljuk) azonnal rotálva lokálban, az új érték elküldve a VPS-nek (MSG-SPACEOS-002).
+3. `claude-main` és `conductor` tokenek rotálva (elővigyázatosságból, bár a git historyban talált értékek már eleve nem voltak élők) — `agents.yaml` (mindkét knowledge-service példány), `.mcp.json` (root + gyökér), `terminals/conductor/.agents/mcp_config.json` frissítve, hot-reload-dal ellenőrizve (régi token elutasítva, új elfogadva).
+4. A leaked tartalom redaktálva minden trackelt fájlból (MEMORY.md, outbox, federacio_atadas_vps_root.md).
+5. `.gitignore` szigorítva mindhárom repóban: `.claude/settings.local.json`, `scratch/`, `docs/knowledge.pre-split-backup-*/` kizárva.
+6. `bin/stdio-bridge.js` hardcode-olt fallback tokenje eltávolítva (fail-closed, kötelező env var), teszt-fixture placeholderre cserélve.
+7. Mindhárom repó git történelme **egyetlen tiszta commit-ra nullázva** (orphan branch + force-push) — a szennyezett history-t senki sem tudja többé elérni a GitHubon. (Nem repó-törlés: az ahhoz szükséges `delete_repo` GitHub-scope tartós jogosultság-bővítés lett volna, ezt Gábor elutasította, helyette a force-push megoldást választotta.)
+8. Mindhárom repó visszaállítva publikusra (Gábor eredeti kérése).
+
+**Tanulság:** mielőtt bármilyen mappát publikus repóba pusholunk, **előbb** teljes `git grep`-es token-seprést kell futtatni (base64-minta, `[A-Za-z0-9+/]{40,44}=`, kizárva `package-lock.json`/`node_modules` a zaj miatt), NEM utólag. A `.claude/settings.local.json` és bármilyen `scratch/`-jellegű mappa alapból gitignore-listás legyen minden új repónál a kezdetektől.
+
 ### Nyitott szálak
 - [ ] VPS: tar.gz-k újraküldése egyedi ID-kkal → utána: kicsomagolás + ingest + governance-szabvány átvétele
 - [ ] Flotta: watcher-prompt egyszerűsítés + retry-limit + agy-log; FLOTTA-TESZT-001 újrafuttatás tiszta configgal → identitás-bizonyítás

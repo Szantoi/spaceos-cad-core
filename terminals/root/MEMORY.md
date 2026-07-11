@@ -735,3 +735,5 @@ A VPS a `federation.messages` központi PostgreSQL táblára (l. [[vps-szeparalt
 **Előny a jelenlegi Claude Code session MCP-kapcsolatához képest**: ez egy sima `curl`/`Invoke-RestMethod` hívás, NEM szenved a "session-szintű MCP-kapcsolat a régi, gyorsítótárazott tokent használja" problémától (l. a cabinet-bridge token-csere incidens tanulsága fentebb) — minden hívás friss processz, friss `.mcp.json`-beli tokent olvas.
 
 **Nyitott**: nincs még bejövő (VPS→Cabinet) megfelelője letesztelve ezen az API-n (a `poll-federation-inbox.ps1` továbbra is a régi MCP `list_inbox`-ot használja) — érdemes lenne rákérdezni, van-e `GET /api/messages/inbox`-szerű végpont is, hogy a pollert is erre lehessen átállítani.
+
+**Talált API-bug (2026-07-11 21:50):** a VPS dokumentációja top-level `"body"` (string) mezőt ír elő, de a valóságban ez **nem kerül mentésre** — a ténylegesen eltárolt/olvasott tartalom a **`"payload"` objektumban** van (`"payload": {"body": "..."}`), nem a top-level `body`-ban. Jelezve a VPS-nek (üzenet ID: dc1225c6-df17-4322-a5f4-30f569788138). **Helyes formátum mostantól**: `payload: {body: "..."}`, NEM `body: "..."`.

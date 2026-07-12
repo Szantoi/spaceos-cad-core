@@ -1,0 +1,81 @@
+# EPICS.yaml — a lokál (Cabinet) flotta projekt/epic/sarokkő definíciói.
+#
+# MIÉRT (goal-externalization, ADR-053 Mode #4 minta): az agentek célismerete NEM
+# a beszélgetés-kontextusban él (az elhalványul — goal drift), hanem ebben a tartós,
+# verziózott configban. A koordinátor briefingje és a wake goal-fókusz innen olvas.
+# Séma: conductor/epicManager.ts (id, name, status, depends_on, checkpoints).
+# A checkpoint = SAROKKŐ: mérhető feltétellel (condition), és azzal, kit értesít
+# a teljesülése (trigger_to) — dense milestone feedback.
+#
+# VÁZLAT — Gábor reviewjára vár: a sarokkövek a session-történetből rekonstruáltak,
+# a hiányzó/rossz tételeket javítani kell, nem kőbe vésettek.
+
+version: "1.0"
+updated: "2026-07-12"
+
+epics:
+  - id: EPIC-CAD-ENGINE
+    name: "CabinetBilder CAD-motor (parametrikus bútor-engine)"
+    status: active
+    depends_on: []
+    checkpoints:
+      - id: CP-CAD-1
+        name: "Skeleton-motor + BOM + árkalkuláció lánc működik (McpHost 7 tool)"
+        status: done
+        condition: "skeleton_create → compute_bom → cost_calculation MCP-lánc smoke PASS"
+      - id: CP-CAD-2
+        name: "IParametricProduct adapter a platform-integrációhoz"
+        status: done
+        condition: "CabinetBilder.SpaceOsModule 6/6 teszt zöld, pusholva"
+      - id: CP-CAD-3
+        name: "spaceos-modules-cabinet viszony tisztázva (kanonikus motor kérdés)"
+        status: pending
+        condition: "VPS-válasz a duplikáció-kérdésre + döntés dokumentálva"
+        trigger_to: [root]
+      - id: CP-CAD-4
+        name: "AutoCAD 3D vizualizáció + tulajdonság-kezelés"
+        status: pending
+        condition: "Adapter.AutoCAD 3D megjelenítés működik teszt-projekten"
+
+  - id: EPIC-DOORSTAR-APP
+    name: "Doorstar műhely-követő web-app (papír-kanban kiváltása)"
+    status: active
+    depends_on: []
+    checkpoints:
+      - id: CP-DS-1
+        name: "Gyártási workflow-modell rögzítve (6 STAGE, 2-szintű FSM)"
+        status: done
+        condition: "Scope-döntés a VPS-szel egyeztetve (MSG-ROOT-040)"
+      - id: CP-DS-2
+        name: "Production API kontraktus (OpenAPI draft) elfogadva"
+        status: pending
+        condition: "VPS OpenAPI draft megérkezett + Cabinet review OK"
+        trigger_to: [root, backend]
+      - id: CP-DS-3
+        name: "Mobil-first műhely UI demo a műhelyvezetőnek"
+        status: pending
+        condition: "Koppintós STAGE-progress demo kipróbálva telefonon"
+
+  - id: EPIC-NEXUS-CONTRIB
+    name: "Nexus-hozzájárulás (federáció, message-model, eval)"
+    status: active
+    depends_on: []
+    checkpoints:
+      - id: CP-NX-1
+        name: "ADR-066 Federation API referencia (send/inbox/ack/status/history)"
+        status: done
+        condition: "48/48 teszt + élő sziget-teszt PASS, VPS értesítve"
+      - id: CP-NX-2
+        name: "Kanonikus message-model + workflow-definíciók configból"
+        status: done
+        condition: "message-model.yaml + workflows.yaml + 15/15 teszt"
+      - id: CP-NX-3
+        name: "messageRegistry-fogyasztók átkötve (VPS-oldali migráció kész)"
+        status: pending
+        condition: "10 fogyasztó a task-message-boxon, messageRegistry nyugdíjazva"
+        trigger_to: [root]
+      - id: CP-NX-4
+        name: "Éles golden-path korpusz gyűlik (execution-based réteg döntéshez)"
+        status: pending
+        condition: "Legalább 10 valós, agentek által végigvitt task trajectory-val"
+        trigger_to: [root]

@@ -19,6 +19,7 @@ set -uo pipefail
 WORKSPACE="/c/Users/szant/Documents/Development/Cabinet_bilder_scripts"
 NEXUS_DIST="/c/Users/szant/Documents/Development/nexus-core/src/nexus-core/knowledge-service/dist/server.js"
 ISLANDS_DIR="$WORKSPACE/islands"
+PROMPTS_DIR="$WORKSPACE/islands/prompts"   # externalized agent prompts (inspectable)
 TERMINALS_DIR="$WORKSPACE/terminals"
 TMUX_SOCKET="/tmp/spaceos.tmux"
 SESSION_PREFIX="cab-"        # tmux sessions are cab-<terminal>
@@ -65,14 +66,22 @@ cmd_wake() {
   local sess="${SESSION_PREFIX}${t}" wd; wd="$(posix_path "$TERMINALS_DIR/$t")"
   [ -d "$wd" ] || { echo "unknown terminal: $t"; exit 1; }
   if tm has-session -t "$sess" 2>/dev/null; then echo "$t already awake ($sess)"; return; fi
-  echo "waking $t (model $model) in $wd ..."
+  # Prompts are EXTERNALIZED (not hardcoded) so it's inspectable/traceable which
+  # message an agent receives on wake — no "black magic". Edit prompts/wake.txt.
+  local wake_prompt_file="$PROMPTS_DIR/wake.txt"
+  local wake_prompt
+  if [ -f "$wake_prompt_file" ]; then wake_prompt="$(cat "$wake_prompt_file")"
+  else echo "  WARN: $wake_prompt_file missing — waking without a task prompt."; wake_prompt=""; fi
+  echo "waking $t (model $model) in $wd ...  [prompt: ${wake_prompt_file}]"
   tm new-session -d -s "$sess" -c "$wd"
   sleep 1
   tm send-keys -t "$sess" -l "claude --model $model"
   tm send-keys -t "$sess" Enter
   sleep 4   # let claude initialize
-  tm send-keys -t "$sess" -l "Olvasd el az inbox/ mappát ebben a könyvtárban, és dolgozd fel a beérkezett feladatokat a legmagasabb prioritással kezdve. A kész munkát az outbox/-ba tedd."
-  tm send-keys -t "$sess" Enter
+  if [ -n "$wake_prompt" ]; then
+    tm send-keys -t "$sess" -l "$wake_prompt"
+    tm send-keys -t "$sess" Enter
+  fi
   echo "  $t awake. Attach with: tmux -S $TMUX_SOCKET attach -t $sess"
 }
 

@@ -38,8 +38,15 @@
 ### JoineryTech submodule-ok
 - A `.gitmodules` most már pusholva (VPS), de: (a) `joinerytech-keycloak-theme` bejegyzés HIÁNYZIK belőle, (b) a submodule URL-ek SSH-sak (`git@github.com`), ehhez GitHub SSH kulcs kell. Generáltam egy dedikált kulcsot (`~/.ssh/github_key`, `~/.ssh/config`-ba bekötve github.com-ra), a public részt Gábornak kézzel kell hozzáadnia a GitHub fiókhoz.
 
+### ⚠️ Párhuzamos-fejlesztés ütközés + helyreállítás (git koordináció)
+- A VPS **force-pusholt** a release/vps-re (`19ce42b` token-rotáció) egy RÉGI bázisról → **letörölte mind a 6+1 hardening-fixemet** ÉS visszahozta a hardcode-olt tokent. Majd `615d0fc` — párhuzamosan implementálta ugyanazt a multi-island izolációt egy TISZTÁBB `src/config/paths.ts` modullal (ISLAND_ID, DATA_DIR, COLLECTION_NAME, AGENTS_CONFIG_PATH, per-DB exportok).
+- **Helyreállítás (nem pingpong):** eldobtam a saját DATA_DIR-megközelítésemet, `git reset --hard origin/release/vps` a te `paths.ts` bázisodra, majd a hiányzó fixjeimet ÚJRA a `paths.ts`-hez kötve alkalmaztam (13 knowledge-service fájl importál most paths-ból). Normál fast-forward push (`615d0fc..8cfcfdf`), nincs force, nincs elveszett munka.
+- **Token még mindig hardcode-olva volt 8 fájlban** (nem csak stdio-bridge): 4 datahaven-web JS route + config.yaml/docs/teszt. A 4 JS-t kiszedtem; a config/docs/teszt string-scrubot (BFG --replace-text) igényel.
+- **TANULSÁG:** megosztott repóban SOHA force-push egyeztetés nélkül; párhuzamos munka előtt egyeztetni ki mit csinál. A `paths.ts` (VPS) jobb volt a sajátomnál — érdemes az upstream megoldásra állni, nem ráerőltetni a sajátot.
+
 ### Lessons
 - `.gitignore` NEM távolítja el a már trackelt fájlokat — `git rm --cached` kell hozzá (kétszer is beleütköztem: nexus-core data/, és a merge-kísérlet fájlzár-hibája).
+- Windows-on futó node folyamat zárolja a SQLite `data/*.db`-t → `git reset/rebase` "Invalid argument" unlink hibával elakad. Meg kell keresni és leállítani a zároló `dist/server.js` folyamatot (magányos smoke-test példányok is!) a git-művelet előtt.
 - Új repóból induló smoke test előtt `npm install` kell (friss klón nincs node_modules) — a build-hibák nem a mi kódunk, csak hiányzó függőségek.
 - PowerShell start scriptekben kerülni a díszítő Unicode/`...` karaktereket — parser-hibát okozott, egyszerű ASCII-val ment.
 

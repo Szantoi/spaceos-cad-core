@@ -105,6 +105,34 @@ tiszta határral — a diszkriminátor az `island` mező (a helyi task-message-b
 4. backend lezárja (`done` + `decisions`) → `cabinet/root` federációs `response`-t küld vissza.
 5. Könyvtáros a `decisions`-t a RAG-ba harvesteli (`shared`, ha releváns más szigeteknek).
 
+## DB-VEZÉRELT agent-management (a "ne legyen fekete doboz" mag)
+
+Gábor követelménye (2026-07-12): az agent-managementet a DB-ben lévő üzenetek
+vezéreljék, NE a fájl-alapú státusz-szöveg — mert az LLM a `.md` frontmatterbe
+inkonzisztensen írja a státuszt (kis/nagybetű, más kifejezés).
+
+### Diagnózis (kód-szinten igazolva)
+Két párhuzamos rendszer él:
+- **DB-vezérelt (jó):** `epicRouter` (saját `task_queue`), `task-message-box`
+  (`status` CHECK-constraint enum: `unread|read|in_progress|completed|blocked|archived`).
+- **Fájl-parse (drift-forrás):** `watchInbox`/`watchDone`/`watchResponse`/`watchStuck`
+  a `.md` frontmattert olvassák — itt jön a `DONE` vs `done` vs `Completed` drift.
+
+### Elv: státusz csak strukturált tool-híváson át
+- Az agent a státuszt **tool-hívással** jelenti (`submit_done`, `complete_task`,
+  `register_working`, `register_idle`) — a paraméter kötött enum. NEM ír státusz-stringet
+  a `.md`-be.
+- A DB (`task-message-box`) a **single source of truth** a státuszra.
+- A `.md` fájl **csak kimenet** (a DB-rekord ember-olvasható renderje) — sosem visszaparse-olva.
+- Az agent-management (dispatch/done/stuck/idle detektálás) a **DB-t** kérdezi.
+
+### Migráció
+1. `watchInbox`/`watchDone`/`watchResponse`/`watchStuck` átállítása: `.md` scan helyett
+   `task-message-box` DB-lekérdezés (a status enumra).
+2. A `.md` render megmarad (ember számára), de a pipeline nem olvassa vissza.
+3. Az agent-prompt/skill: státusz-jelentés = tool-hívás, nem frontmatter-szerkesztés.
+Így a drift a gyökerénél szűnik meg: az LLM nem gépel státuszt, hanem kötött paramétert ad.
+
 ## Nyitott kérdések (VPS-egyeztetés)
 - OD-A: poll vs. push (webhook/SSE) a sziget-oldali kézbesítéshez?
 - OD-B: a `decisions` mező formátuma (szabad szöveg vs. strukturált: {döntés, indok, alternatívák})?

@@ -133,6 +133,30 @@ Két párhuzamos rendszer él:
 3. Az agent-prompt/skill: státusz-jelentés = tool-hívás, nem frontmatter-szerkesztés.
 Így a drift a gyökerénél szűnik meg: az LLM nem gépel státuszt, hanem kötött paramétert ad.
 
+## DB-FIRST + token-optimalizálás (Gábor irány, 2026-07-12)
+
+A fájl-alapot NEM erőltetjük — a `.md` a tesztek állványzata volt, és nehezíti a rendszert.
+Ami nem gátolja a tudásgyűjtést, az a DB-be kerül; a DB a backbone.
+
+### Elvek
+- **DB-first:** a rendszer a `task-message-box` DB-n operál (dispatch, státusz, audit,
+  harvest). A `.md` legfeljebb OPCIONÁLIS ember-olvasható render — nem a működés útján van.
+- **Token-optimalizálás (mindig figyelni az optimális működésre):**
+  - A pipeline és a könyvtáros **strukturált DB-sorokat** kérdez (szűrt mezők), NEM
+    teljes `.md`-ket parse-ol. Egy `list` metaadatot ad (id/from/to/type/status/subject),
+    a teljes `body`/`decisions` csak kérésre töltődik — így nagyságrenddel kevesebb token.
+  - A könyvtáros **könnyen emészthető formátumot** kap: egy DB-nézet, ami CSAK a
+    `status='completed' AND decisions IS NOT NULL` sorokat adja, a `decisions` +
+    `completion_summary` mezőkkel — nem kell végigolvasnia a nyers üzeneteket.
+  - Dedup `content_hash`-sel a DB-ben → nincs ismételt feldolgozás (token-pazarlás).
+- **Következmény a librariannek:** a harvest bemenete egy szűk, strukturált lekérdezés,
+  nem fájl-scan — kevesebb token, gyorsabb, kevesebb zaj.
+
+### Gyakorlati megjegyzés (jelenlegi állapot)
+A Cabinet→VPS most a fájl-outboxon megy, de CSAK azért, mert a datahaven-web DB-alapú
+REST API épp 502 (le van állva). Ez kényszer-fallback, nem a terv. Amint a központi
+DB-API visszajön, a fájl-út kivezetve.
+
 ## Nyitott kérdések (VPS-egyeztetés)
 - OD-A: poll vs. push (webhook/SSE) a sziget-oldali kézbesítéshez?
 - OD-B: a `decisions` mező formátuma (szabad szöveg vs. strukturált: {döntés, indok, alternatívák})?

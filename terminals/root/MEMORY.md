@@ -44,9 +44,15 @@
 - **Token még mindig hardcode-olva volt 8 fájlban** (nem csak stdio-bridge): 4 datahaven-web JS route + config.yaml/docs/teszt. A 4 JS-t kiszedtem; a config/docs/teszt string-scrubot (BFG --replace-text) igényel.
 - **TANULSÁG:** megosztott repóban SOHA force-push egyeztetés nélkül; párhuzamos munka előtt egyeztetni ki mit csinál. A `paths.ts` (VPS) jobb volt a sajátomnál — érdemes az upstream megoldásra állni, nem ráerőltetni a sajátot.
 
+### Federáció réteg-modell + Windows-ébresztés + egységes fleet vezérlő (2026-07-12 folyt.)
+- **Réteg-modell (ADR-proposal):** federáció CSAK sziget-határon át (`to_island != from_island`). Minden más HELYI: a `task-message-box`-ban nincs is `island` mező. A helyi tudás = sziget saját RAG-collection; helyi feladat = terminál↔terminál; helyi ébresztés = epicRouter/watch*/spawn_work_session (MÁR kész a nexusban). Rootok = federáció gateway-ei (két-szintű hub-and-spoke: központ köti a rootokat, root a saját termináljainak hubja). Root→root = federációs üzenet `to_terminal: root` mindkét oldalon. Proposal: `docs/knowledge/federation/ADR-PROPOSAL_scalable_task_message_federation.md`, elküldve VPS-nek (outbox, mert datahaven-web 502).
+- **Windows terminál-ébresztés MŰKÖDIK:** a nexus tmux-alapú (`common.ts`: `tmux -S /tmp/spaceos.tmux new-session` + `send-keys`). Ezen a gépen VAN tmux 3.6a + `claude` CLI (Git Bash). Az EGYETLEN Windows-fix: a `tmux new-session -c` workdir POSIX-út legyen (`/c/Users/...`), NEM `C:/...` — utóbbinál a pane shellje el sem indul. Bizonyítva: `send-keys -l "<cmd>"` + `Enter` lefut, ha a cwd POSIX. A szigetet futtató node-nak látnia kell a tmux-ot a PATH-ján.
+- **Egységes fleet vezérlő:** `fleet.sh` (Git Bash) — EGY belépési pont a szétszórt szkriptek helyett: `up|down|status|wake <t> [model]|send <t> <text>|sleep <t>|ls`. Kiváltja start-cad/doorstar.ps1 + federation-watcher.sh + kézi tmux. Session-nevek: `cab-<terminál>` a `/tmp/spaceos.tmux` socketen. `wake` VALÓDI claude agentet indít (token + autonóm) → csak explicit jóváhagyással.
+
 ### Lessons
 - `.gitignore` NEM távolítja el a már trackelt fájlokat — `git rm --cached` kell hozzá (kétszer is beleütköztem: nexus-core data/, és a merge-kísérlet fájlzár-hibája).
 - Windows-on futó node folyamat zárolja a SQLite `data/*.db`-t → `git reset/rebase` "Invalid argument" unlink hibával elakad. Meg kell keresni és leállítani a zároló `dist/server.js` folyamatot (magányos smoke-test példányok is!) a git-művelet előtt.
+- MSYS/Git Bash tmux: a `-c` start-dir POSIX-út kell (`/c/...`), Windows-út (`C:/...`) esetén a pane shell némán nem indul → send-keys nem hajtódik végre.
 - Új repóból induló smoke test előtt `npm install` kell (friss klón nincs node_modules) — a build-hibák nem a mi kódunk, csak hiányzó függőségek.
 - PowerShell start scriptekben kerülni a díszítő Unicode/`...` karaktereket — parser-hibát okozott, egyszerű ASCII-val ment.
 

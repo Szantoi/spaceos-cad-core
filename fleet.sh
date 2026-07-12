@@ -107,14 +107,41 @@ cmd_status() {
 
 cmd_ls() { echo "Terminals: $TERMINALS"; }
 
+# ── Federation (ADR-066): the root operates on the DB-driven /api/federation API,
+#    not hand-written outbox .md files. Token-optimized, audited, logged. ─────────
+FED_BASE="http://localhost:13457/api/federation"   # the CAD island serves the API
+fed_token() { grep '^MCP_AUTH_TOKEN=' "$ISLANDS_DIR/cad/.env" | cut -d= -f2-; }
+fed_curl()  { curl -s -m 8 -H "Authorization: Bearer $(fed_token)" "$@"; }
+
+cmd_fed_send() { # <to_island> <to_terminal> <subject> <body...>
+  local to_island="${1:?usage: fed-send <to_island> <to_terminal> <subject> <body>}"
+  local to_terminal="${2:?to_terminal required (usually root)}"; local subject="${3:?subject required}"; shift 3
+  local body="$*"
+  fed_curl -X POST "$FED_BASE/send" -H "Content-Type: application/json" \
+    -d "$(printf '{"from_island":"cabinet","from_terminal":"root","to_island":"%s","to_terminal":"%s","type":"info","priority":"medium","subject":"%s","body":"%s"}' "$to_island" "$to_terminal" "$subject" "$body")"
+  echo
+}
+
+cmd_fed_inbox() { # [island=cabinet] [status=unread]
+  local island="${1:-cabinet}" status="${2:-unread}"
+  fed_curl "$FED_BASE/inbox?island=$island&status=$status"; echo
+}
+
+cmd_fed_msg() { fed_curl "$FED_BASE/message/${1:?usage: fed-msg <id>}"; echo; }
+cmd_fed_ack() { fed_curl -X POST "$FED_BASE/ack" -H "Content-Type: application/json" -d "{\"id\":\"${1:?usage: fed-ack <id>}\"}"; echo; }
+
 # ── Dispatch ──────────────────────────────────────────────────────────────────
 case "${1:-}" in
-  up)     cmd_up ;;
-  down)   cmd_down ;;
-  status) cmd_status ;;
-  wake)   shift; cmd_wake "$@" ;;
-  send)   shift; cmd_send "$@" ;;
-  sleep)  shift; cmd_sleep "$@" ;;
-  ls)     cmd_ls ;;
-  *) echo "Usage: ./fleet.sh {up|down|status|wake <t> [model]|send <t> <text>|sleep <t>|ls}"; exit 1 ;;
+  up)        cmd_up ;;
+  down)      cmd_down ;;
+  status)    cmd_status ;;
+  wake)      shift; cmd_wake "$@" ;;
+  send)      shift; cmd_send "$@" ;;
+  sleep)     shift; cmd_sleep "$@" ;;
+  ls)        cmd_ls ;;
+  fed-send)  shift; cmd_fed_send "$@" ;;
+  fed-inbox) shift; cmd_fed_inbox "$@" ;;
+  fed-msg)   shift; cmd_fed_msg "$@" ;;
+  fed-ack)   shift; cmd_fed_ack "$@" ;;
+  *) echo "Usage: ./fleet.sh {up|down|status|wake <t> [model]|send <t> <text>|sleep <t>|ls|fed-send <island> <term> <subj> <body>|fed-inbox [island] [status]|fed-msg <id>|fed-ack <id>}"; exit 1 ;;
 esac

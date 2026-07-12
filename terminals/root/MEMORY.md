@@ -65,6 +65,13 @@
 - **Szállítva (additív, NEM érinti a 10 fogyasztót):** `config/message-model.yaml` (EGY forrás: 4 típus task/question/response/info, 6 státusz unread→read→in_progress→completed|blocked→archived, átmenet-államgép, MINDEN legacy→kanonikus mapping; env: MESSAGE_MODEL_CONFIG_PATH); `message-model.ts` DDD-modul (isValidTransition, mapLegacy*); store additív: `status_history` JSON audit + `updateMessageStatus` (validál+history+log) + `verifyMessageHash`/`verifyAllMessages`; README a miértekkel. Fogalmi javítás: done/blocked már NEM típus, hanem státusz. 36/36 teszt.
 - VPS vocab elfogadta; a 10 fogyasztó átkötése (3. lépés) VPS-feladat, értesítve (0f69f176). Task #20.
 
+### ✅ Agent Eval Suite — Golden Path + Trajectory Comparison LESZÁLLÍTVA (a5e75ec, élesben bizonyítva)
+- A VPS kutatási csomagja (spaceos-core 5fd501fc → lokál RAG-ba ingesztálva, 3912→5787 chunk) alapján, a VPS Q3 roadmap-tétele (~200 NWT) előrehozva és leszállítva.
+- **Szubsztrát:** `POST /api/federation/status` (tool-call státusz-átmenet: kanonikus enum + config-államgép + status_history; 409 invalid átmenetre) + `GET /api/federation/history/:id` (trajectory).
+- **Eval-domain (`src/eval/`):** `goldenPath.ts` (sikeres task életciklusa nevesített, inspectálható JSON referenciaként; GOLDEN_PATHS_DIR env-override; üres trajectory-t elutasít) + `trajectoryComparator.ts` (DETERMINISZTIKUS Levenshtein+backtrace: minden score mellett NEVESÍTETT deviancia — missing/extra/substituted; nem LLM ítélkezik LLM felett) + `/api/eval` HTTP (golden record/list/get + compare).
+- **Bizonyítás:** 48/48 teszt + élő end-to-end a CAD szigeten: perfekt run score=1.0; deviáns run (kihagyott in_progress) score=0.667 + `{missing: in_progress}` nevesítve. VPS értesítve (39e64b6b).
+- Következő rétegek (ha kell): expected_tools/deliverables check (execution-based verification), Datahaven dashboard-integráció.
+
 ### Prompt-kiszervezés + observability (Gábor: "ne legyen fekete mágia")
 - Cél: látni, mikor milyen üzenetet/promptot kap az agent; a promptok configba, ne hardcode.
 - 1. lépés (Cabinet): a `fleet.sh` wake-promptja kiszervezve `islands/prompts/wake.txt`-be (inspectálható, a fleet logolja a prompt-fájlt) — 8e24e53.

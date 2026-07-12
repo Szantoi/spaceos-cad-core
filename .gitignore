@@ -50,6 +50,13 @@ node_modules/
 **/.mcp.json
 **/.agents/mcp_config.json
 
+# Island runtime configs — per-island .env (holds MCP_AUTH_TOKEN) + agents.yaml
+# (holds the token->agent map) + data/ (live SQLite). Structure is tracked via
+# .env.example; the real secret/state files never go in git.
+islands/*/.env
+islands/*/agents.yaml
+islands/*/data/
+
 # Claude Code local settings (permission-approval history can embed literal
 # command strings, which may contain tokens/secrets typed during a session)
 .claude/settings.local.json

@@ -59,6 +59,17 @@
 - **✅ datahaven `/api/messages` ÚJRA ÉL** (502 megoldva). Kétirányú központi csatorna igazolva: bejövő nexus-ping ACK-olva + kimenő reconciliation-üzenet elküldve.
 - **Következő kör (VPS-válasz után):** könyvtáros-harvest (döntések→RAG); a Cabinet-oldali híd (poll központi → lokális task-message-box); projekt/goal/mód-4 bevezetés a szigeteknél ([[sziget-projekt-goal-mode4-teendo]] jellegű).
 
+### ✅ Kanonikus message-model konszolidáció — additív alap (985c70e, tesztelt)
+- Gábor: "fogalmakat rendbe rakni, nulla adósság" + config-vezérelt (nincs hardcode) + Clean/DDD + komment/log + doksi + kötelező teszt.
+- **Felmérés (meglepő):** a `messageRegistry` a HASZNÁLT rendszer (10 fogyasztó: inboxWatcher, összes watch*, taskEscalation, terminalStatus, sessionStarter), gazdag (hash-verifikáció, status_history, fs-sync); a `task-message-box` az újabb/tisztább (2 fogyasztó). A task-message-box a kanonikus (Gábor).
+- **Szállítva (additív, NEM érinti a 10 fogyasztót):** `config/message-model.yaml` (EGY forrás: 4 típus task/question/response/info, 6 státusz unread→read→in_progress→completed|blocked→archived, átmenet-államgép, MINDEN legacy→kanonikus mapping; env: MESSAGE_MODEL_CONFIG_PATH); `message-model.ts` DDD-modul (isValidTransition, mapLegacy*); store additív: `status_history` JSON audit + `updateMessageStatus` (validál+history+log) + `verifyMessageHash`/`verifyAllMessages`; README a miértekkel. Fogalmi javítás: done/blocked már NEM típus, hanem státusz. 36/36 teszt.
+- VPS vocab elfogadta; a 10 fogyasztó átkötése (3. lépés) VPS-feladat, értesítve (0f69f176). Task #20.
+
+### Prompt-kiszervezés + observability (Gábor: "ne legyen fekete mágia")
+- Cél: látni, mikor milyen üzenetet/promptot kap az agent; a promptok configba, ne hardcode.
+- 1. lépés (Cabinet): a `fleet.sh` wake-promptja kiszervezve `islands/prompts/wake.txt`-be (inspectálható, a fleet logolja a prompt-fájlt) — 8e24e53.
+- Nyitva: a nexus pipeline promptjai (autonomousDev/autoRestart tmux send-keys) megosztott kód → VPS-koordináció; a VPS-en van egy KUTATÁS az agent-rendszerek teszteléséről (Gábor említette) — le kell kérni/hivatkozni. A status_history + `[TaskMessageBox] from→to (by)` log már observability-alap.
+
 ### Lessons
 - `.gitignore` NEM távolítja el a már trackelt fájlokat — `git rm --cached` kell hozzá (kétszer is beleütköztem: nexus-core data/, és a merge-kísérlet fájlzár-hibája).
 - Windows-on futó node folyamat zárolja a SQLite `data/*.db`-t → `git reset/rebase` "Invalid argument" unlink hibával elakad. Meg kell keresni és leállítani a zároló `dist/server.js` folyamatot (magányos smoke-test példányok is!) a git-művelet előtt.

@@ -66,6 +66,45 @@ a Postgres logba, törölhetetlenül. Bármikor lekérdezhető: "mit döntött X
    döntés-harvestet a `docs/knowledge/federation/harvested/`-ba, mint referencia.
 4. **Belső szigetek:** a VPS a fájl-watchert lecseréli a központi API-poll-ra.
 
+## RÉTEG-MODELL: mi helyi (sziget) és mi federációs?
+
+A federáció CSAK a sziget-határt átlépő üzenet. Minden más helyi marad. Két réteg,
+tiszta határral — a diszkriminátor az `island` mező (a helyi task-message-ben NINCS is).
+
+### 1. réteg — HELYI (sziget-belső) — MÁR KÉSZ a nexusban
+- **Helyi tudás:** a sziget saját RAG-collectionje (CAD=`cabinetbilder-cad`,
+  Doorstar=`cabinetbilder-doorstar`). Alapból SOHA nem hagyja el a szigetet.
+- **Helyi feladatok:** `task-message-box` terminál↔terminál EGY szigeten belül
+  (nincs `island` mező) → `terminals/<név>/inbox`-ba renderel. Nem érinti a központi hubot.
+- **Terminál-ébresztés helyi szinten (megvan!):** `epicRouter` (idle terminálnak
+  dispatch), `watchInbox`/`watchIdle`/`watchQueue`/`watchPriority` (figyel + trigger),
+  `spawn_work_session`/`spawn_parallel_workers`/`register_working`/`register_idle`,
+  `projectDispatcher`, `nightwatch`. Ez mind sziget-belső, nem federációs.
+
+### 2. réteg — FEDERÁCIÓS (sziget-közi)
+- Csak akkor, ha `to_island != from_island`. A task-message-re rákerül az `island` cím.
+- **Tudás-szeparáció:** alapból semmi nem federálódik. Csak a könyvtáros által
+  `shared`-nek jelölt, kiharvestelt DÖNTÉSEK kerülnek a közös/federált tudás-rétegbe.
+- Áthalad a központi `datahaven` API-n + audit-logon.
+
+### Rootok kommunikációja = a federáció gateway-ei
+- Minden sziget **root**-ja a helyi hub ÉS a federációs kapu egyszerre.
+- **Root→root** = egy federációs üzenet, ahol mindkét oldalon `to_terminal: root`.
+- Egy root: fogad federációs üzenetet (`to_island: én`) → **helyben dispatch-eli**
+  egy worker-terminálnak (1. réteg ébresztés) → küld kifelé federációs üzenetet.
+- Két-szintű hub-and-spoke: a **központ a rootokat** köti össze; **minden root a saját
+  termináljainak helyi hubja**. Így a federáció nem ismeri a belső terminálokat — csak
+  a rootokat; a belső ébresztés/dispatch teljesen helyi marad.
+
+### Egy üzenet útja (példa: VPS taskot ad a Cabinet backendnek)
+1. `spaceos/root` → federációs task, `to_island: cabinet, to_terminal: root`.
+2. Központi API + audit-log rögzíti; `cabinet/root` inboxába kézbesül.
+3. `cabinet/root` HELYBEN dispatch-eli: `task-message-box`, `to_terminal: backend`,
+   `epicRouter`/`spawn_work_session` felébreszti a backendet — ez már 1. réteg, a
+   federáció nem látja.
+4. backend lezárja (`done` + `decisions`) → `cabinet/root` federációs `response`-t küld vissza.
+5. Könyvtáros a `decisions`-t a RAG-ba harvesteli (`shared`, ha releváns más szigeteknek).
+
 ## Nyitott kérdések (VPS-egyeztetés)
 - OD-A: poll vs. push (webhook/SSE) a sziget-oldali kézbesítéshez?
 - OD-B: a `decisions` mező formátuma (szabad szöveg vs. strukturált: {döntés, indok, alternatívák})?

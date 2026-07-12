@@ -5,6 +5,46 @@
 
 ---
 
+## 📋 SESSION 2026-07-12 — Nexus konszolidáció: egy repó = egy igazság + biztonsági incidens
+
+**Status:** ✅ Lokál nexus-fejlesztés feloldva · ✅ CAD+Doorstar egy közös checkout-ból fut · ⚠️ nexus-core token-szivárgás rotálásra vár (VPS) · ⏳ #15 Cabinet-motor duplikáció válaszra vár
+
+### 🔑 KÖZPONTOSÍTÁS: nexus-core = a knowledge-service egyetlen forrása
+- **Repóstruktúra tisztázva:** `Szantoi/nexus-core` (VPS: `/opt/nexus`) = knowledge-service FŐREPÓ (`src/nexus-core/knowledge-service/`). `Szantoi/spaceos-core` (VPS: `/opt/spaceos`) = KOORDINÁCIÓ only (root/conductor terminálok), a benne lévő `spaceos-nexus/knowledge-service/` üres (csak .gitignore).
+- **Release-modell:** `release/vps` branch + `v1.x.x` tag a nexus-core-ban. Sync workflow: `git fetch origin --tags` → `git checkout <tag>` → `npm install && npm run build` → smoke test `/health`.
+- **Lokál klón:** `Development/nexus-core` (release/vps branch). Az `upstream` remote is beállítva (github nexus-core).
+
+### 6 hardening-fix commitolva+pusholva a nexus-core release/vps-re (98c4019, eb68d83, 8b370f3)
+1. `COLLECTION_NAME` env-driven — `vectorStore.ts` ÉS `hybridSearch.ts` (utóbbi plusz találat, második hardcode volt).
+2. `/health` javítás: `KNOWLEDGE_BASE_PATH`-ot olvas (nem a nemlétező `KNOWLEDGE_PATH`-ot), + `collectionName` a válaszban.
+3. `TERMINALS_ROOT` env-driven (`TERMINALS_PATH`).
+4. `bin/stdio-bridge.js` hardcode fallback token ELTÁVOLÍTVA (kötelező `MCP_AUTH_TOKEN`).
+5. 23 trackelt SQLite/state fájl kivéve a git indexből (`.gitignore` csak új commitot állít meg, a régit `git rm --cached` kell).
+6. **Rate-limit bug:** `indexer.ts` minden fájl után 40mp Voyage-delay-t alkalmazott FELTÉTEL NÉLKÜL, helyi ingyenes embeddingnél is → 150 fájl ~100 perc helyett ~45mp. Most csak `useVoyage()` esetén vár.
+7. Multi-island izoláció: `DATA_DIR`/`AGENTS_CONFIG_PATH` env-vezérelt, a `*_DATA_DIR` vál-k `DATA_DIR`-re esnek vissza — egyetlen `DATA_DIR` izolál egy instance-t.
+
+### ✅ CAD+Doorstar szigetek → egy közös nexus-core checkout (a 2 fork-repó kiváltása)
+- Új harness: `Cabinet_bilder_scripts/islands/{cad,doorstar}/` — mindkét sziget a KÖZÖS `nexus-core/.../dist/server.js`-t futtatja, csak env különbözik (PORT, COLLECTION_NAME, KNOWLEDGE_BASE_PATH, DATA_DIR, AGENTS_CONFIG_PATH, MCP_AUTH_TOKEN).
+- Élőben verifikálva: mindkét sziget egyszerre fut (CAD 13457/cabinetbilder-cad/3912 dok, Doorstar 13458/cabinetbilder-doorstar/87 dok), külön `data/`-ba ír, nulla ütközés.
+- Git-trackelt: start scriptek, `.env.example`-ök, README. Gitignore-olt: `islands/*/.env`, `islands/*/agents.yaml`, `islands/*/data/`. Push: spaceos-cad-core `12a76eb`.
+- A régi fork-repók (`spaceos-cad-nexus`, `spaceos-cad-doorstar`) mostantól redundánsak — nyugdíjazhatók, ha a modell bevált a napi használatban.
+
+### ⚠️ BIZTONSÁGI INCIDENS (nexus-core, VPS-oldali): teljes token-készlet szivárgás
+- A **publikus** `nexus-core` repó `config/agents.yaml`-je tartalmazta a `master_token`-t (ROOT hozzáférés) + mind a 8 SpaceOS terminál tokent + `cabinet-bridge` tokent — mind egyezik a lokál szigetünk élő tokenjeivel. Plusz a `stdio-bridge.js` hardcode fallback token.
+- **Konténment (kérdés nélkül, védelmi):** `nexus-core` repó priváttá állítva (`gh repo edit --visibility private`). Verifikálva: private.
+- **VPS-nek kell (koordináció, ŐK validálják):** master + összes terminál + cabinet-bridge token rotálása, `config/agents.yaml` gitignore-olása a nexus-core-ban, git history scrub (token a `v1.0.0` tag-ben is). → #16 task, még nyitva.
+- Megfigyelés: a Doorstar sziget master tokenje MÁR eltér a CAD-étól (`pul1x5Od...` vs `IoUpLUgr...`), tehát részben már rotált.
+
+### JoineryTech submodule-ok
+- A `.gitmodules` most már pusholva (VPS), de: (a) `joinerytech-keycloak-theme` bejegyzés HIÁNYZIK belőle, (b) a submodule URL-ek SSH-sak (`git@github.com`), ehhez GitHub SSH kulcs kell. Generáltam egy dedikált kulcsot (`~/.ssh/github_key`, `~/.ssh/config`-ba bekötve github.com-ra), a public részt Gábornak kézzel kell hozzáadnia a GitHub fiókhoz.
+
+### Lessons
+- `.gitignore` NEM távolítja el a már trackelt fájlokat — `git rm --cached` kell hozzá (kétszer is beleütköztem: nexus-core data/, és a merge-kísérlet fájlzár-hibája).
+- Új repóból induló smoke test előtt `npm install` kell (friss klón nincs node_modules) — a build-hibák nem a mi kódunk, csak hiányzó függőségek.
+- PowerShell start scriptekben kerülni a díszítő Unicode/`...` karaktereket — parser-hibát okozott, egyszerű ASCII-val ment.
+
+---
+
 ## 📋 SESSION 2026-07-10 — Governance-csomag INGEST + kanonikus tudás-gyökér átállás
 
 **Status:** ✅ KÉSZ — a VPS governance-tudás a lokál RAG-ban, kereshetően · ⏳ VPS OpenAPI draft még mindig nem érkezett

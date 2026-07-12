@@ -72,6 +72,18 @@
 - **Bizonyítás:** 48/48 teszt + élő end-to-end a CAD szigeten: perfekt run score=1.0; deviáns run (kihagyott in_progress) score=0.667 + `{missing: in_progress}` nevesítve. VPS értesítve (39e64b6b).
 - Következő rétegek (ha kell): expected_tools/deliverables check (execution-based verification), Datahaven dashboard-integráció.
 
+### ✅ Workflow-definíciók + szerver-kezelt projekt-API + golden-path migráció (fd3e4a9, 39c1a1c, 5ab94fc)
+- **workflows.yaml + /api/eval/conformance:** deklarált elvárt lefolyás típusonként (config), + config-vezérelt stuck-küszöbök. A golden path FELVETT, a workflow ELŐÍRÓ — ugyanaz a pontozó.
+- **Szerver-kezelt projekt/epic/sarokkő** (Gábor: "a fájl megkerülhető, a szerver logolható"): `/api/projects/*` (status/epic/checkpoint/complete/import-yaml), a DB (epic-router store bővítve) a source of truth, az EPICS.yaml csak egyszeri SEED. "Hol tartunk?" = 1 API-hívás. Élő: 3 epic/11 sarokkő seedelve, status működik. A wake-prompt LIVE húzza a célt a szerverből (goal-fókusz, drift ellen).
+- **Golden-path migráció (csapatok között!):** a VPS a 711 legacy DONE-t az én pinnelt sémámba parse-olta és a `/api/eval/golden/import`-tal betöltötte. Séma-pinning nulla divergenciával működött. ADAT-LECKE: 711 futás státusz-szinten csak 2 trajektória (676 happy + 35 blocked) → a trajectory-scoring durva; a valódi jel a deliverables-ben lenne, de a migrált adat null-deliverables. → execution-based réteg letéve, amíg éles futások nem termelik a deliverables-t.
+- **60+9/9 teszt** az egész új-feature készletben. Minden `release/vps`-en (HEAD 5ab94fc).
+
+### 🅿️ DÖNTÉS (Gábor): eval-csiszolás LETÉVE — a VPS folyamatosan fut és gyűjti nekünk az éles adatot
+- A gépezet (federation API, message-model, eval-suite, projekt-API, golden-import) KÉSZ + tesztelt. Nem csiszoljuk tovább valós futási adat nélkül.
+- A VPS-nek deployolnia kell a `release/vps` HEAD-et (deploy-checklist: outbox MSG-006), különben a folyamatos futás a RÉGI kódon gyűjt. ⚠️ A 023fabc séma-fix kritikus (különben crash meglévő DB-n).
+- Amit gyűjtenek nekünk: gazdag golden path-ok (files_changed/completion_details), trajectory-eltérések a workflows.yaml-tól, sarokkő-haladás.
+- NEM indítottam élő lokál agentet (nincs cab-* session) — a folyamatos futás a VPS flottáján megy.
+
 ### Prompt-kiszervezés + observability (Gábor: "ne legyen fekete mágia")
 - Cél: látni, mikor milyen üzenetet/promptot kap az agent; a promptok configba, ne hardcode.
 - 1. lépés (Cabinet): a `fleet.sh` wake-promptja kiszervezve `islands/prompts/wake.txt`-be (inspectálható, a fleet logolja a prompt-fájlt) — 8e24e53.

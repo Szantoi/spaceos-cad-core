@@ -32,8 +32,8 @@ tm() { tmux -S "$TMUX_SOCKET" "$@"; }
 posix_path() { echo "$1" | sed -E 's#^([A-Za-z]):[\\/]#/\L\1/#; s#\\#/#g'; }
 
 # ── Islands ───────────────────────────────────────────────────────────────────
-island_up() { # $1 = cad|doorstar   $2 = port
-  local name="$1" port="$2" dir="$ISLANDS_DIR/$1"
+island_up() { # $1 = cad|doorstar   $2 = port   $3 = optional island dir override
+  local name="$1" port="$2" dir="${3:-$ISLANDS_DIR/$1}"
   if curl -s -m 2 -o /dev/null "http://localhost:$port/health" 2>/dev/null; then
     echo "  island $name already up on $port"; return
   fi
@@ -45,7 +45,8 @@ cmd_up() {
   [ -f "$NEXUS_DIST" ] || { echo "ERROR: nexus build missing at $NEXUS_DIST — run 'npm run build' in knowledge-service first."; exit 1; }
   echo "Bringing fleet islands up:"
   island_up cad 13457
-  island_up doorstar 13458
+  # Doorstar 2026-07-14 óta a saját repójából fut (adat + profil ott él):
+  island_up doorstar 13458 "C:/Users/szant/Documents/Development/doorstar-instance"
   echo "Islands launching (indexing ~1min on first boot). Check: ./fleet.sh status"
 }
 
@@ -60,6 +61,28 @@ cmd_down() {
   echo "done."
 }
 
+# ── Goal focus (server-managed, per Gábor: goals live in the DB behind the API,
+#    never edited as files — every read/change is served + logged) ──────────────
+goal_context() {
+  # Compact "hol tartunk" snapshot from GET /api/projects/status for prompt injection.
+  local token; token="$(fed_token)"
+  node -e '
+    const t = process.argv[1];
+    fetch("http://localhost:13457/api/projects/status", { headers: { Authorization: "Bearer " + t }})
+      .then(r => r.json())
+      .then(d => {
+        const lines = (d.projects || [])
+          .filter(p => p.epic_status === "active")
+          .map(p => {
+            const next = p.next_checkpoint ? `kovetkezo sarokko: ${p.next_checkpoint.name} (${p.next_checkpoint.condition})` : "minden sarokko kesz";
+            return `- ${p.epic_id} [${p.progress.percent}%]: ${next}`;
+          });
+        console.log(lines.join("\n"));
+      })
+      .catch(() => {}); // island down → empty context, wake still works
+  ' "$token" 2>/dev/null
+}
+
 # ── Terminals (tmux-based local wake) ─────────────────────────────────────────
 cmd_wake() {
   local t="${1:?usage: wake <terminal> [model]}" model="${2:-$DEFAULT_MODEL}"
@@ -68,20 +91,35 @@ cmd_wake() {
   if tm has-session -t "$sess" 2>/dev/null; then echo "$t already awake ($sess)"; return; fi
   # Prompts are EXTERNALIZED (not hardcoded) so it's inspectable/traceable which
   # message an agent receives on wake — no "black magic". Edit prompts/wake.txt.
+  # The goal context is fetched LIVE from the server API (server-managed goals):
+  # the agent gets the current epics + next cornerstones without touching files.
   local wake_prompt_file="$PROMPTS_DIR/wake.txt"
-  local wake_prompt
+  local wake_prompt goals
   if [ -f "$wake_prompt_file" ]; then wake_prompt="$(cat "$wake_prompt_file")"
   else echo "  WARN: $wake_prompt_file missing — waking without a task prompt."; wake_prompt=""; fi
-  echo "waking $t (model $model) in $wd ...  [prompt: ${wake_prompt_file}]"
+  goals="$(goal_context)"
+  if [ -n "$goals" ]; then
+    wake_prompt="AKTIV CELOK (a szerver /api/projects/status-abol, ehhez igazodj):
+$goals
+
+$wake_prompt"
+  fi
+  echo "waking $t (model $model) in $wd ...  [prompt: ${wake_prompt_file} + live goal context]"
   tm new-session -d -s "$sess" -c "$wd"
   sleep 1
-  tm send-keys -t "$sess" -l "claude --model $model"
-  tm send-keys -t "$sess" Enter
-  sleep 4   # let claude initialize
+  # Pass the wake prompt as a LAUNCH ARGUMENT, not by pasting it into the TUI after
+  # start. Pasting a big multi-line prompt raced with Claude Code's UI init on
+  # Windows/tmux and garbled the text. Here we write the prompt to a runtime file
+  # and start `claude ... "$(cat FILE)"` in one short, single-line command — bash
+  # expands the file into a single argument, so there is no send-keys/redraw race.
   if [ -n "$wake_prompt" ]; then
-    tm send-keys -t "$sess" -l "$wake_prompt"
-    tm send-keys -t "$sess" Enter
+    local runtime_prompt="/tmp/spaceos-wake-${t}.txt"
+    printf '%s' "$wake_prompt" > "$runtime_prompt"
+    tm send-keys -t "$sess" -l "claude --model $model \"\$(cat '$runtime_prompt')\""
+  else
+    tm send-keys -t "$sess" -l "claude --model $model"
   fi
+  tm send-keys -t "$sess" Enter
   echo "  $t awake. Attach with: tmux -S $TMUX_SOCKET attach -t $sess"
 }
 

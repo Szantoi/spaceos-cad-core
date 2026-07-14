@@ -17,3 +17,9 @@
 - **Anyagszükséglet** (Bill of Materials)
 - **Szabásterv** (Cutting list / plan)
 - **Összetett Árkalkuláció** (Cost calculation table)
+
+## MINŐSÉGI ELVÁRÁSOK
+
+Kötelező: **[QUALITY.md](../../QUALITY.md)** — Gábor minőségi elvárásai minden munkára
+(clean code + DDD, config-vezérelt, logolás, tesztek, goal-fókusz, token-tudatosság,
+memento minden nagyobb lépés végén).

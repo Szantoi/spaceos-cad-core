@@ -7,6 +7,7 @@ priority: high
 status: UNREAD
 created: 2026-07-12
 subject: Cabinet a JoineryTech portálon dolgozik — diagnózis + FSM-governance PR#1 + folyamatban a bekötés
+content_hash: e8310e119da31ff73115955c83ce8879615bf14f63cfe73472c5c2b9e91b00eb
 ---
 
 # Cabinet → JoineryTech: portál-munka bejelentés

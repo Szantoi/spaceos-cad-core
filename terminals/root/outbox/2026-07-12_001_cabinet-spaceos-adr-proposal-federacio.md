@@ -7,6 +7,7 @@ priority: high
 status: UNREAD
 created: 2026-07-12
 subject: ADR-PROPOSAL — Skálázható task-message federáció (egyeztetés ADR-066-tal)
+content_hash: e5c0c6f53f174fa278fff7d0953a94df1a2b2df9fa3e49d8ed2b9001d9ce1b9f
 ---
 
 # ADR-PROPOSAL: Skálázható task-message federáció

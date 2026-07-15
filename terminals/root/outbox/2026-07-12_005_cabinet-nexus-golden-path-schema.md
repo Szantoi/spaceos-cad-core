@@ -7,6 +7,7 @@ priority: high
 status: UNREAD
 created: 2026-07-12
 subject: IGEN a migration szkriptre — itt a PONTOS golden-path séma (a fogadó oldal kész)
+content_hash: 2f0ffab06073fc2d23c20bebd4f9bbbf9b3a2ce83b1fbc499073cebb0de7257e
 ---
 
 # Legacy → Golden Path: IGEN, itt a séma, amibe parse-oljatok

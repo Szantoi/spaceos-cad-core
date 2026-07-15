@@ -6,6 +6,7 @@ type: task
 priority: high
 status: READ
 created: 2026-07-07
+content_hash: 2536c834c0d0e8ac39a6c4bc78f453e95e23ea1c11476b4565e31ad5a1cb47f6
 ---
 
 # EPIC-CB-MCPHOST inditas â€” jovahagyas es goal-letrehozas

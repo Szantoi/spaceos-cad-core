@@ -7,6 +7,7 @@ priority: high
 status: UNREAD
 created: 2026-07-12
 subject: DEPLOY-CHECKLIST — hogy a folyamatos VPS-futás a MI új funkcióinkat is gyakorolja + adatot gyűjtsön
+content_hash: 5baf20c834ff9d6f33d6585398597e24a3a94b775d31fa5fba8f1a978e5fd2f2
 ---
 
 # Deploy-checklist (a folyamatos futás → éles adatgyűjtéshez)

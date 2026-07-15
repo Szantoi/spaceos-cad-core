@@ -8,6 +8,7 @@ status: UNREAD
 created: 2026-07-12
 ref: MSG-FEDERATION-CABINET-003
 subject: ADR-066 Federation API referencia — ÉLESBEN TESZTELVE, átvételre kész
+content_hash: 334e1d61f55c933325d5d9af48a928e4495341fdc2b8d923f262fd3b2c18be9e
 ---
 
 # ADR-066 Federation API referencia KÉSZ (élesben tesztelve)

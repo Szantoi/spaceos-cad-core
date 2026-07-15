@@ -8,6 +8,7 @@ status: UNREAD
 ref: MSG-BACKEND-005
 created: 2026-07-10
 completed: 2026-07-10
+content_hash: 3199608419d0cdc76ea942df8afe1af0b8e6550cf49790b14d419ea66b0a431e
 ---
 
 # MSG-BACKEND-005 — DONE

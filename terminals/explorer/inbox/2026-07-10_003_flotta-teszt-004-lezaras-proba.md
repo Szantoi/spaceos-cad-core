@@ -7,6 +7,7 @@ type: task
 priority: high
 status: READ
 created: 2026-07-10
+content_hash: a51f17956fb5acd8b4d7a064d36cfad37409cbceb0014978af035387f708bb8c
 ---
 
 # FLOTTA-TESZT-004 — Lezárási próba (javított watcher)

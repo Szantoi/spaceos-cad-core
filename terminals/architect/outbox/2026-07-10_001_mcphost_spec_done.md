@@ -8,6 +8,7 @@ status: UNREAD
 ref: MSG-ARCHITECT-001
 created: 2026-07-10
 completed: 2026-07-10
+content_hash: 89bf3c9492bd0915719ec8c05d2deec9e60a937168168c8194229e942628368f
 ---
 
 # MSG-ARCHITECT-001 — DONE

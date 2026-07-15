@@ -7,7 +7,7 @@ priority: high
 status: READ
 ref: MSG-CONDUCTOR-001
 created: 2026-07-06
-content_hash: ef7836482bb4be462ef3063499d24cd32f98dc4df859f009cb11284278f267e1
+content_hash: 2f5de52848a22cb3065f0adb861318fc3ed97af056e113e845d39d85abf106b8
 ---
 
 # Implement GrooveOperation domain model, validation and serialization

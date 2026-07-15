@@ -6,7 +6,7 @@ type: task
 priority: high
 status: READ
 created: 2026-07-05
-content_hash: bc652429c6c5b6af280f8bf6ba33f21ff91953e67031e7b3921898256b4c4652
+content_hash: d51d27876f18e1010aa63d8e25a132489257c5cb4629b73cd2b81e505843d014
 ---
 
 # Implement AutoCAD 3D visualization and properties overrule for GrooveOperation

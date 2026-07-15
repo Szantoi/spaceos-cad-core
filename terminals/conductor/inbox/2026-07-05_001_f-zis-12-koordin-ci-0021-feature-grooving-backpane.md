@@ -6,7 +6,7 @@ type: task
 priority: high
 status: READ
 created: 2026-07-05
-content_hash: b9ed6815d4baa3e98dba3013175640a30b4a443a7eace0ddfa4b75207de752ad
+content_hash: b34369ec598f31affdb58d19b9ff8ae761552f22f86db6f3909ddfc9019d1036
 ---
 
 # Fázis 12 koordináció: 0021-feature-grooving-backpanel

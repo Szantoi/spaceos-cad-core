@@ -6,6 +6,7 @@ type: task
 priority: medium
 status: READ
 created: 2026-07-07
+content_hash: 8a7687237b8e41e1831349074382bc7c4a4f635fe93196e2f7a190856a8a363c
 ---
 
 # FLOTTA-TESZT-001: Egyszeru kapcsolat-proba

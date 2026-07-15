@@ -7,6 +7,7 @@ type: task
 priority: high
 status: READ
 created: 2026-07-10
+content_hash: b236b46c8e7cd4d8f70a9909dd3f40d9ab2f48bb85124de62538f94657395631
 ---
 
 # FLOTTA-TESZT-003 — Izolációs próba (lokál sziget)

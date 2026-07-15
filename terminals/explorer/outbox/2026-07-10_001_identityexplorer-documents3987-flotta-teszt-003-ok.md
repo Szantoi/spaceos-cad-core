@@ -8,6 +8,7 @@ status: UNREAD
 ref: MSG-EXPLORER-002
 created: 2026-07-10
 completed: 2026-07-10
+content_hash: db75bffe2b0b2ffb2688e86d3b5612eac5d611647d911f74a2aa2db0409467be
 ---
 
 # MSG-EXPLORER-002 — DONE

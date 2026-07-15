@@ -8,6 +8,7 @@ status: UNREAD
 created: 2026-07-12
 ref: MSG-FEDERATION-CABINET-001
 subject: ADR-066 — Cabinet elkezdi a /api/federation/* referencia-implementációt (ne építsetek párhuzamosan)
+content_hash: ea7ff541cd1e288c507177aeeadd14f4f8cc636aeea365ef165b8abd2b6077c5
 ---
 
 # ADR-066 build heads-up (kollízió-elkerülés)

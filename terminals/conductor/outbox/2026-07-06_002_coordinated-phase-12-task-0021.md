@@ -8,6 +8,7 @@ status: UNREAD
 ref: MSG-CONDUCTOR-001
 created: 2026-07-06
 completed: 2026-07-06
+content_hash: 21fb2d822babe5be331dd2cf94167d8b5c55f9a9124b086bb05416fc8c642752
 ---
 
 # MSG-CONDUCTOR-001 — DONE

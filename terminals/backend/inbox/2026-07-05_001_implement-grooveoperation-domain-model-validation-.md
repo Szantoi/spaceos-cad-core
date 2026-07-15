@@ -6,7 +6,7 @@ type: task
 priority: high
 status: READ
 created: 2026-07-05
-content_hash: ef7836482bb4be462ef3063499d24cd32f98dc4df859f009cb11284278f267e1
+content_hash: 8f820d67e2ade75095c393cbd2784485b9f688720d26ee4dd93c39712e0befaf
 ---
 
 # Implement GrooveOperation domain model, validation and serialization

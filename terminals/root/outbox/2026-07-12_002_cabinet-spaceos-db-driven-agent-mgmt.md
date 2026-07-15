@@ -8,6 +8,7 @@ status: UNREAD
 created: 2026-07-12
 ref: MSG-FEDERATION-CABINET-001
 subject: DB-vezérelt agent-management — koordináció a watch* refaktorhoz
+content_hash: ba73b31f6f67f806e18e9704c61900b45ca06774fc26f0a5d1aecac8c2848b19
 ---
 
 # DB-vezérelt agent-management (koordinációs kérés)

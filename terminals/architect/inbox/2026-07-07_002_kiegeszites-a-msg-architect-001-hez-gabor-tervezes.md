@@ -6,6 +6,7 @@ type: info
 priority: high
 status: READ
 created: 2026-07-07
+content_hash: e908bd6339c8040af4d835267e3e3e4081a26dfc8c12595c13b0b809757a27f8
 ---
 
 # KIEGESZITES a MSG-ARCHITECT-001-hez â€” Gabor tervezesi elvei (KOTELEZO)

@@ -3,7 +3,6 @@ using CabinetBilder.Adapter.AutoCAD.Infrastructure.ObjectMetadata;
 using CabinetBilder.Adapter.AutoCAD.Infrastructure;
 using CabinetBilder.Adapter.AutoCAD.Infrastructure.Overrules;
 using CabinetBilder.Adapter.AutoCAD.UI.SmartObjectPalette;
-using CabinetBilder.Adapter.AutoCAD.Infrastructure.OPM;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -40,8 +39,11 @@ namespace CabinetBilder.Adapter.AutoCAD
             // 4. Wire change observer -> palette refresh
             SmartObjectChangeObserver.SmartObjectModified += SmartObjectPaletteManager.Instance.NotifyObjectModified;
 
-            // 4.1 Register OPM properties
-            SkeletonPropertyManager.Register();
+            // NOTE: the former OPM (Object Property Manager) property registration was
+            // removed on 2026-07-14: AutoCAD 2027 no longer ships AcPropServices.dll,
+            // so the managed PropertyInspector API is unavailable. Skeleton parameters
+            // are edited via the CB_SKELETON_PARAM command instead (supported path:
+            // ApplyParameter -> XRecord persistence -> SkeletonSyncService redraw).
 
             // 5. Subscribe to documents being created/opened
             AcadApp.DocumentManager.DocumentCreated += OnDocumentCreated;
@@ -62,8 +64,6 @@ namespace CabinetBilder.Adapter.AutoCAD
 
             SmartObjectChangeObserver.Unregister();
             SmartObjectGripOverrule.Unregister();
-
-            SkeletonPropertyManager.Unregister();
 
             SmartObjectPaletteManager.Instance.Dispose();
 

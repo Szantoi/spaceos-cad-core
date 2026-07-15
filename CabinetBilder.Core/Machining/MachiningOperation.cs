@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace CabinetBilder.Core.Machining
 {
@@ -6,6 +7,9 @@ namespace CabinetBilder.Core.Machining
     /// Base record for all machining operations on a panel.
     /// Positions are relative to the panel's local coordinate system.
     /// </summary>
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+    [JsonDerivedType(typeof(DrillOperation), "drill")]
+    [JsonDerivedType(typeof(GrooveOperation), "groove")]
     public abstract record MachiningOperation
     {
         public string Name { get; init; } = string.Empty;

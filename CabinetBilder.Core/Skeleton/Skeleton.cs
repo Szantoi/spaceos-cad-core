@@ -50,6 +50,14 @@ public sealed class Skeleton
         _parameters.Add(SkeletonParameter.String("BackMaterialId", "HDF3_WHITE", "Back panel material"));
         _parameters.Add(SkeletonParameter.String("EdgingId", "ABS2_WHITE", "Edge banding for carcass panels"));
 
+        // Back-panel machining method (config-driven, opt-in). Default = applied
+        // back (rátett hátlap) so existing behaviour is unchanged; set BackGrooved
+        // = true to slot the back into a groove (hornyolt hátlap) on the carcass.
+        _parameters.Add(SkeletonParameter.Bool("BackGrooved", false, "Hátlap hornyba fut-e (true) vagy rátett (false)"));
+        _parameters.Add(SkeletonParameter.Double("BackGrooveDepth", 8.0, "Hátlaphorony mélysége a korpuszpanelbe (mm)"));
+        _parameters.Add(SkeletonParameter.Double("BackGrooveSetback", 12.0, "Hátlaphorony távolsága a hátsó éltől a középvonalig (mm)"));
+        _parameters.Add(SkeletonParameter.Double("BackGrooveClearance", 0.2, "Horony-szélesség ráhagyás a hátlap vastagságához (mm)"));
+
         Rebuild();
     }
 
@@ -141,12 +149,36 @@ public sealed class Skeleton
 
         // 6. Apply Drillings
         DrillingService.ApplyDrilling(this);
+
+        // 7. Apply back-panel grooving (opt-in, config-driven). Defaults are read
+        // defensively so a Rebuild() on an older skeleton that predates these
+        // parameters falls back to an applied back instead of throwing.
+        bool backGrooved = GetParameterOrDefault("BackGrooved", false);
+        if (backGrooved)
+        {
+            GroovingService.ApplyBackPanelGrooving(
+                this,
+                grooveDepth: GetParameterOrDefault("BackGrooveDepth", 8.0),
+                setback: GetParameterOrDefault("BackGrooveSetback", 12.0),
+                clearance: GetParameterOrDefault("BackGrooveClearance", 0.2));
+        }
     }
 
     private T GetParameterValue<T>(string key)
     {
         var param = _parameters.First(p => p.Key == key);
         return (T)Convert.ChangeType(param.Value, typeof(T));
+    }
+
+    /// <summary>
+    /// Reads a parameter by key, returning <paramref name="fallback"/> when the
+    /// parameter is absent — used for parameters added later so older serialized
+    /// skeletons keep working (no black-box crash on Rebuild).
+    /// </summary>
+    private T GetParameterOrDefault<T>(string key, T fallback)
+    {
+        var param = _parameters.FirstOrDefault(p => p.Key.Equals(key, StringComparison.OrdinalIgnoreCase));
+        return param == null ? fallback : (T)Convert.ChangeType(param.Value, typeof(T));
     }
 
     public void AddComponent(SkeletonComponent component)

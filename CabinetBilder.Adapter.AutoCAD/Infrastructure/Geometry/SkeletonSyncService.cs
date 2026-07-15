@@ -11,6 +11,10 @@ namespace CabinetBilder.Adapter.AutoCAD.Infrastructure.Geometry
     {
         public const string GeometryLayer = "CB_Geometry";
         public const string DrillingsLayer = "CB_Drillings";
+        public const string GroovesLayer = "CB_Grooves";
+
+        /// <summary>Alpha for groove bodies (0 = invisible, 255 = opaque): semi-transparent red.</summary>
+        private const byte GrooveTransparencyAlpha = 127;
 
         public static void Sync(ObjectId objectId, Skeleton skeleton)
         {
@@ -28,12 +32,13 @@ namespace CabinetBilder.Adapter.AutoCAD.Infrastructure.Geometry
             // Ensure layers exist
             EnsureLayer(db, tr, GeometryLayer, 7);
             EnsureLayer(db, tr, DrillingsLayer, 1); // Red for drillings
+            EnsureLayer(db, tr, GroovesLayer, 1);   // Red for grooves (bodies are also semi-transparent)
 
             // 1. Remove old generated geometry and drillings
             foreach (ObjectId entId in btr)
             {
                 var ent = tr.GetObject(entId, OpenMode.ForWrite);
-                if (ent is Solid3d || (ent is Circle && ent.Layer == DrillingsLayer))
+                if (ent is Solid3d || (ent is Circle circle && circle.Layer == DrillingsLayer))
                 {
                     ent.Erase();
                 }
@@ -57,6 +62,18 @@ namespace CabinetBilder.Adapter.AutoCAD.Infrastructure.Geometry
                         drill.Layer = DrillingsLayer;
                         btr.AppendEntity(drill);
                         tr.AddNewlyCreatedDBObject(drill, true);
+                    }
+
+                    // Grooves: distinct semi-transparent red bodies so their position
+                    // on the panel can be verified visually. Erased and regenerated
+                    // together with the panel solids above (both are Solid3d).
+                    var grooves = SkeletonGeometryGenerator.CreateGrooveGraphics(component);
+                    foreach (var groove in grooves)
+                    {
+                        groove.Layer = GroovesLayer;
+                        groove.Transparency = new Autodesk.AutoCAD.Colors.Transparency(GrooveTransparencyAlpha);
+                        btr.AppendEntity(groove);
+                        tr.AddNewlyCreatedDBObject(groove, true);
                     }
                 }
                 catch (Exception)

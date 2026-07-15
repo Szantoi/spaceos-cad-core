@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Pure-domain test project. References ONLY CabinetBilder.Core so the domain
+    layer (Machining, Skeleton, parametric rules) is verifiable WITHOUT the
+    AutoCAD SDK. The monolithic CabinetBilder.Tests project pulls in
+    CabinetBilder.Adapter.AutoCAD, which cannot build on a machine without
+    AutoCAD installed — that coupled every domain test to an infrastructure
+    adapter. Clean Architecture: domain tests must not depend on an adapter.
+    net10.0 (not net10.0-windows): the domain is platform-independent.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.8.3" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CabinetBilder.Core\CabinetBilder.Core.csproj" />
+  </ItemGroup>
+</Project>

@@ -60,10 +60,8 @@
       <HintPath>$(AutoCADManagedDllPath)\acmgd.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <Reference Include="AcPropServices">
-      <HintPath>$(AutoCADManagedDllPath)\AcPropServices.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
+    <!-- AcPropServices (OPM/PropertyInspector) is NOT referenced: AutoCAD 2027 no
+         longer ships it. Parameter editing goes through CB_SKELETON_PARAM instead. -->
   </ItemGroup>
 
   <ItemGroup>

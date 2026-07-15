@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="CabinetBilder.Core/CabinetBilder.Core.csproj" />
+  <Project Path="CabinetBilder.Core.Tests/CabinetBilder.Core.Tests.csproj" />
   <Project Path="CabinetBilder.SpaceOsBridge/CabinetBilder.SpaceOsBridge.csproj" />
   <Project Path="CabinetBilder.SpaceOsModule/CabinetBilder.SpaceOsModule.csproj" />
   <Project Path="CabinetBilder.SpaceOsModule.Tests/CabinetBilder.SpaceOsModule.Tests.csproj" />
